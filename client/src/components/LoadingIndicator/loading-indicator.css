@@ -1,0 +1,6 @@
+
+.loading {
+    width: 48px;
+    height: 48px;
+    background: url('/assets/images/ajax-loader.gif') no-repeat;
+}

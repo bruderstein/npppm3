@@ -1,0 +1,35 @@
+{
+  "name": "npppm",
+  "version": "3.0.0",
+  "scripts": {
+    "start": "nodemon server/index",
+    "start-db": "docker run -d --name npppm-couchdb -e NODENAME=single -p 5985:5984 -v $(pwd)/couchdb-data:/opt/couchdb/data klaemo/couchdb && scripts/initialise-couchdb.sh localhost:5985",
+    "stop-db": "docker rm -f npppm-couchdb",
+    "clean-db": "rm -rf ./couchdb-data",
+    "stop-clean-db": "npm run stop-db & npm run clean-db",
+    "test": "mocha server/tests/*.spec.js"
+  },
+  "devDependencies": {
+    "couchapp": "^0.11.0",
+    "mocha": "^3.1.2",
+    "request": "^2.79.0",
+    "request-promise": "^4.1.1",
+    "sinon": "^1.17.6",
+    "unexpected": "^10.18.1",
+    "unexpected-couchdb": "^0.10.1",
+    "unexpected-http": "^5.6.0",
+    "unexpected-mitm": "^9.3.4",
+    "unexpected-sinon": "^10.5.0"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "config": "^1.24.0",
+    "glue": "^4.0.0",
+    "hapi": "^15.2.0",
+    "joi": "^9.2.0",
+    "lodash": "3.5.0",
+    "nano": "^6.2.0",
+    "uuid": "^3.0.0",
+    "xml-js-converter": "^1.0.0"
+  }
+}

@@ -1,0 +1,54 @@
+
+
+Keep a:
+
+- current-<pluginId>    (current editing version)
+- edithistory-<uniqueid>   (once for each save, saved AFTER updating current-pluginId, but uniqueid generated BEFORE, so that the current-<pluginId> holds the current uniqueId)
+- published-<pluginId>  (current published version), holds link to edithistory-uniqueId
+- publishhistory-<uniqueid> (once for each publish, with key for edithistory-<uniqueid>)
+
+
+On save:
+  Generate uniqueid
+  Attempt to update current-<pluginId> with provided _rev (save structure, modified_at, modified_by, edit_id as the generated uniqueid)
+  on success:
+     save edithistory-uniqueid
+
+On publish:
+  Generate uniqueid
+  Attempt to update current-<pluginid>, just set `published: true`, and publish-uniqueid  (* not sure we actually need that, but might as well keep it)
+  on success:
+    update published-pluginId, new definition (from current-<pluginid>), and publishhistory-uniqueid
+    save publishhistory-uniqueid
+
+On rollback publish  (Inputs: pluginId, publishhistory-uniqueid, current-publish_rev)
+  Generate uniqueid
+  Attempt to update publish-<pluginId> (definition from provided publishhistory-uniqueid, _rev is current-publish_rev)
+  On success:
+    save publishhistory-uniqueid
+  
+
+
+Gives us:
+  Easy view on published plugins
+  Easy view on current edits
+  Easy view on history of individual plugins
+
+
+Keep valid MD5s in plugin structure
+  - don't export this (as in, just in couch, not in api view, also excluded from current/published list views)
+  - have an easy view for "published" MD5s, and "current" MD5s
+  - Track the MD5s back to the plugin
+  - If we remove a plugin, we remove the MD5s too. Disable a plugin, disables those MD5s
+  - Q: Do we need to keep all the history, or just the ones that are in use now?  Tricky to decide
+   - Probably need to keep all for now. May be able to filter later. Maybe keep the version we added with the MD5?
+
+Or, keep the MD5s separate, with a reference to the pluginId and the added uniqueId (means keeping the MD5s to add
+client side, and issueing one big POST with the definition AND new MD5s. That's probably not a bad thing...
+ - Published /unpublished is harder. Unless we keep more copies of them, i.e. copy them on publish, but that feels
+ bad and more non-atomic transactions (publish would consist of 3 steps or something, and all could individually fail)
+ Difficult to tell which MD5s are really included with a publish (e.g. if edit1 saved 2 MD5s, and edit2 saved 1MD5,
+ and edit3 saved 1 MD5, then we publish edit3, which MD5s should be included?
+ Easier with a list in the plugin itself (could even manually remove client side?)
+
+

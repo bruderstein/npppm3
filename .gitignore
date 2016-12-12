@@ -1,0 +1,5 @@
+.idea/workspace.xml
+node_modules/
+couchdb-data/
+client/build/
+npm-debug.log

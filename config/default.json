@@ -1,0 +1,5 @@
+{
+  "couch": {
+    "url": "http://localhost:5985/plugins"
+  }
+}
