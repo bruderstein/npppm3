@@ -6,7 +6,8 @@ import { fetchPluginList } from '../../actions'
 import styles from '../../styles.css';
 
 import PluginList from '../PluginList/PluginList';
-import PluginEditor from '../PluginEditor/PluginEditor';
+import EditPlugin from '../PluginEditor/EditPlugin';
+import NewPlugin from '../PluginEditor/NewPlugin';
 import Row from '../Grid/Row';
 
 class App extends Component {
@@ -19,8 +20,13 @@ class App extends Component {
     return (
       <Row>
         <Match pattern="/plugins" exactly component={PluginList} />
-        <Match pattern="/plugins/:id" component={PluginEditor} />
-        <Miss render={ () => <Redirect to="/plugins" /> } />
+        <Match pattern="/plugins/new" exactly component={NewPlugin} />
+        <Miss render={ () => {
+          return (<div>
+            <Match pattern="/plugins/:id" component={EditPlugin} />
+            <Miss render={() => <Redirect to="/plugins" />} />
+          </div>);
+        } } />
       </Row>
     );
   }

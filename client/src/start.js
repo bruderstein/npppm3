@@ -4,11 +4,15 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router';
 import { AppContainer } from 'react-hot-loader';
+// TODO: Submit this update as a PR (
+import RedboxReact from '@bruderstein/redbox-react'
+
+import styles from './styles.css';
 
 import store from './store';
 
 ReactDOM.render(
-        <AppContainer>
+        <AppContainer errorReporter={RedboxReact}>
           <Provider store={store}>
             <BrowserRouter>
               <App />

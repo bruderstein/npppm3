@@ -1,0 +1,9 @@
+
+.infoWrapper {
+  width: 100%;
+}
+
+.shrink {
+  width: calc(100% - 2em);
+  float: left;
+}
