@@ -13,23 +13,9 @@ const mockDb = {};
 
 const expect = unexpected
   .clone()
-  .use(require('unexpected-sinon'));
+  .use(require('unexpected-sinon'))
+  .use(require('./to-yield-exchange-assertion'));
 
-expect.addAssertion('<object> to yield exchange <object>', function (expect, server, exchange) {
-  return new Promise((resolve, reject) => {
-    server.inject(exchange.request, function (response) {
-      resolve(response)
-    });
-  }).then(response => {
-    expect.errorMode = 'bubble';
-    if (exchange.result) {
-      expect(response.result, 'to satisfy', exchange.result);
-    }
-    if (exchange.response) {
-      expect(response, 'to satisfy', exchange.response)
-    }
-  });
-});
 
 expect.addType({
   name: 'JoiSchema',

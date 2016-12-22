@@ -2,7 +2,7 @@
   "name": "npppm",
   "version": "3.0.0",
   "scripts": {
-    "start": "nodemon server/index",
+    "start": "nodemon server/index.js",
     "start-db": "docker run -d --name npppm-couchdb -e NODENAME=single -p 5985:5984 -v $(pwd)/couchdb-data:/opt/couchdb/data klaemo/couchdb && scripts/initialise-couchdb.sh localhost:5985",
     "stop-db": "docker rm -f npppm-couchdb",
     "clean-db": "rm -rf ./couchdb-data",
@@ -27,8 +27,10 @@
     "glue": "^4.0.0",
     "hapi": "^15.2.0",
     "joi": "^9.2.0",
+    "jszip": "^3.1.3",
     "lodash": "3.5.0",
     "nano": "^6.2.0",
+    "node-fetch": "^1.6.3",
     "uuid": "^3.0.0",
     "xml-js-converter": "^1.0.0"
   }
