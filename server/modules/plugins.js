@@ -1,6 +1,5 @@
 'use strict';
 const boom = require('boom');
-const db = require('../lib/db');
 const joi = require('joi');
 const pluginSchema = require('./pluginSchema');
 const recordTypes = require('../lib/recordTypes');
@@ -67,17 +66,17 @@ const register = module.exports = function register(server, options, next) {
             hashes: request.payload.hashes,
             datestamp: Date.now()
           }).then(result => {
-              return server.app.db.insertAsync({
-                  type: recordTypes.EDIT_HISTORY,
-                  _id: editId,
-                  pluginId: result.id,
-                  definition: request.payload.definition,
-                  hashes: request.payload.hashes,
-                  datestamp: Date.now()
-                })
-                .then(() => ({ pluginId: result.id, _rev: result.rev }));
-            });
-            
+            return server.app.db.insertAsync({
+              type: recordTypes.EDIT_HISTORY,
+              _id: editId,
+              pluginId: result.id,
+              definition: request.payload.definition,
+              hashes: request.payload.hashes,
+              datestamp: Date.now()
+            })
+              .then(() => ({ pluginId: result.id, _rev: result.rev }));
+          });
+
           return reply(resultPromise);
         }
       }
@@ -117,7 +116,7 @@ const register = module.exports = function register(server, options, next) {
                   response.output.payload.definition = result.definition;
                   response.output.payload._rev = result._rev;
   
-                  return Promise.reject(response)
+                  return Promise.reject(response);
                 });
             }
             return Promise.reject(err);
@@ -156,7 +155,7 @@ const register = module.exports = function register(server, options, next) {
                 _rev: result._rev,
                 published: result.published,
                 definition: result.definition
-              }
+              };
             });
           
           reply(resultPromise);
@@ -228,11 +227,11 @@ const register = module.exports = function register(server, options, next) {
                     publishedRev: publishResult.rev,
                     datestamp: Date.now()
                   })
-                    .then(() => ({ published: true, _rev: plugin._rev }))
+                    .then(() => ({ published: true, _rev: plugin._rev }));
                 });
             });
           
-          reply(resultPromise)
+          reply(resultPromise);
         }
       }
     }
@@ -243,8 +242,8 @@ const register = module.exports = function register(server, options, next) {
 
 register.attributes = {
   pkg: {
-    name: "api-plugins",
-    version: "1.0.0"
+    name: 'api-plugins',
+    version: '1.0.0'
   }
 };
 

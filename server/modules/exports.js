@@ -1,13 +1,5 @@
 'use strict';
-const boom = require('boom');
-const db = require('../lib/db');
-const joi = require('joi');
-const pluginSchema = require('./pluginSchema');
-const recordTypes = require('../lib/recordTypes');
 const { toXml } = require('../lib/xmlConvert');
-const uuid = require('uuid');
-
-const UUID_REGEX = /^[a-f0-9-]{36}$/;
 
 const register = module.exports = function register(server, options, next) {
   
@@ -76,7 +68,7 @@ function hashesToObject(result) {
 
 register.attributes = {
   pkg: {
-    name: "api-exports",
-    version: "1.0.0"
+    name: 'api-exports',
+    version: '1.0.0'
   }
 };

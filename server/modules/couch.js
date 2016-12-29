@@ -11,8 +11,8 @@ const register = module.exports = function register(server, options, next) {
 
 register.attributes = {
   pkg: {
-    name: "api-couch",
-    version: "1.0.0"
+    name: 'api-couch',
+    version: '1.0.0'
   }
 };
 

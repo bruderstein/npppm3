@@ -1,8 +1,9 @@
 'use strict';
+const Hapi = require('hapi');
 const joi = require('joi');
 const plugins = require('../modules/plugins');
 const pluginSchema = require('../modules/pluginSchema');
-const server = require('../server');
+//const server = require('../server');
 const sinon = require('sinon');
 const unexpected = require('unexpected');
 const uuid = require('uuid');
@@ -32,7 +33,7 @@ expect.addAssertion('<any> [not] to validate against schema <JoiSchema>', functi
     // expect.errorMode = 'bubble';
     expect.fail({
       diff: function (output) { return output.error(result.error); }
-    })
+    });
   }
 
   if (!result.error && this.flags.not) {
@@ -42,17 +43,21 @@ expect.addAssertion('<any> [not] to validate against schema <JoiSchema>', functi
 
 describe('server - plugins', function () {
 
-  let instance;
+  let server;
   beforeEach(function () {
-    
-    return server.then(i => {
-      instance = i;
-      mockDb.getAsync = sinon.stub();
-      mockDb.insertAsync = sinon.stub();
-      mockDb.viewAsync = sinon.stub();
-      instance.app.db = mockDb;
+
+    server = new Hapi.Server();
+    server.connection({ port: 5000 });
+
+    return new Promise(resolve => {
+      server.register(plugins, function () {
+        mockDb.getAsync = sinon.stub();
+        mockDb.insertAsync = sinon.stub();
+        mockDb.viewAsync = sinon.stub();
+        server.app.db = mockDb;
+        resolve();
+      });
     });
-    
   });
 
   describe('plugin validation', function () {
@@ -70,7 +75,7 @@ describe('server - plugins', function () {
           () => expect({ name: 'abcdefg' }, 'to validate against schema', schema),
           'to throw',
           [
-            `expected { name: 'abcdefg' } to validate against schema <JoiSchema>`,
+            'expected { name: \'abcdefg\' } to validate against schema <JoiSchema>',
             '',
             'ValidationError: child "name" fails because ["name" with value "abcdefg" fails to match the required pattern: /^[a-f]+$/]'
           ].join('\n')
@@ -86,7 +91,7 @@ describe('server - plugins', function () {
         expect(
           () => expect({ name: 'abcdef' }, 'not to validate against schema', schema),
           'to throw',
-          `expected { name: 'abcdef' } not to validate against schema <JoiSchema>`
+          'expected { name: \'abcdef\' } not to validate against schema <JoiSchema>'
         );
       });
     });
@@ -130,7 +135,7 @@ describe('server - plugins', function () {
 
     it('allows a copy step', function () {
       expect({
-          name: 'x', description: 'y', author: 'me',
+        name: 'x', description: 'y', author: 'me',
         install: [
           { 
             unicode: [
@@ -218,7 +223,7 @@ describe('server - plugins', function () {
         ]
       }));
       
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: '/api/plugins',
         result: {
           plugins: [
@@ -251,7 +256,7 @@ describe('server - plugins', function () {
     
     it('returns the pluginId and rev', function () {
     
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'POST',
           url: '/api/plugins',
@@ -269,7 +274,7 @@ describe('server - plugins', function () {
     
     it('issues both inserts for current and edit-history', function () {
     
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'POST',
           url: '/api/plugins',
@@ -311,7 +316,7 @@ describe('server - plugins', function () {
     
     it('returns the pluginId and new rev', function () {
       
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'PUT',
           url: '/api/plugins/' + PLUGIN_ID,
@@ -330,7 +335,7 @@ describe('server - plugins', function () {
     
     it('issues both updates for current and insert edit-history', function () {
       
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'PUT',
           url: '/api/plugins/' + PLUGIN_ID,
@@ -365,7 +370,7 @@ describe('server - plugins', function () {
         .withArgs(PLUGIN_ID)
         .returns(Promise.resolve({ _id: PLUGIN_ID, _rev: '2-123abc', type: 'current', definition: { name: 'test 2' } }));
       
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'PUT',
           url: '/api/plugins/' + PLUGIN_ID,
@@ -395,7 +400,7 @@ describe('server - plugins', function () {
         .withArgs(PLUGIN_ID)
         .returns(Promise.resolve({ _id: PLUGIN_ID, _rev: '2-123abc', type: 'edit-history', definition: { name: 'test 2' } }));
   
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'PUT',
           url: '/api/plugins/' + PLUGIN_ID,
@@ -425,7 +430,7 @@ describe('server - plugins', function () {
         .withArgs(PLUGIN_ID)
         .returns(Promise.resolve({ _id: PLUGIN_ID, _rev: '2-123abc', type: 'current', definition: { name: 'test 2' } }));
   
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'GET',
           url: '/api/plugins/' + PLUGIN_ID
@@ -442,7 +447,7 @@ describe('server - plugins', function () {
         .withArgs(PLUGIN_ID)
         .returns(Promise.resolve({ _id: PLUGIN_ID, _rev: '2-123abc', type: 'edit-history', definition: { name: 'test 2' } }));
   
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'GET',
           url: '/api/plugins/' + PLUGIN_ID
@@ -486,7 +491,7 @@ describe('server - plugins', function () {
         .withArgs(sinon.match({ type: 'publish-history' }))
         .returns(Promise.resolve({ id: '6111', rev: '2-111bbb' }));
       
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'POST',
           url: '/api/plugins/' + PLUGIN_ID + '/publish',
@@ -536,7 +541,7 @@ describe('server - plugins', function () {
         .withArgs(sinon.match({ _id: PLUGIN_ID, _rev: '3-123abc' }))
         .returns(Promise.reject({ statusCode: 409 }));
     
-      return expect(instance, 'to yield exchange', {
+      return expect(server, 'to yield exchange', {
         request: {
           method: 'POST',
           url: '/api/plugins/' + PLUGIN_ID + '/publish',

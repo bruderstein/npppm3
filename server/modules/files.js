@@ -27,14 +27,14 @@ const register = module.exports = function register(server, options, next) {
 
           return fetch(request.payload.url).then(result => {
             if (result.status === 200) {
-              return result.buffer()
+              return result.buffer();
             } else {
-              throw boom.badRequest('Fetching failed')
+              throw boom.badRequest('Fetching failed');
             }
           })
             .then(result => {
               return zip.loadAsync(result)
-                .catch(e => {
+                .catch(() => {
                   // If there was an error interpreting the file as a zip, just return it as a raw file
                   return { isRawFile: RAW_FILE_IDENTIFIER, content: result };
                 })
@@ -66,17 +66,17 @@ const register = module.exports = function register(server, options, next) {
                   );
                 }).then(results => {
                   if (results.isRawFile === RAW_FILE_IDENTIFIER) {
-                    return reply({ isRawFile: true, files: [ { name: path.basename(url.parse(request.payload.url).path), md5: results.md5 } ] })
+                    return reply({ isRawFile: true, files: [ { name: path.basename(url.parse(request.payload.url).path), md5: results.md5 } ] });
                   }
-                  reply({ files: results.filter(file => file).sort((a, b) => a.name > b.name) })
-                })
+                  reply({ files: results.filter(file => file).sort((a, b) => a.name > b.name) });
+                });
             })
             .catch(e => {
               if (e.isBoom) {
-                return reply(e)
+                return reply(e);
               }
-              console.log('ERROR', e)
-              reply(boom.internal())
+              console.log('ERROR', e);
+              reply(boom.internal());
             });
         }
       }
@@ -88,7 +88,7 @@ const register = module.exports = function register(server, options, next) {
 
 register.attributes = {
   pkg: {
-    name: "api-files",
-    version: "1.0.0"
+    name: 'api-files',
+    version: '1.0.0'
   }
 };
