@@ -1,0 +1,12 @@
+{
+  "auth": {
+    "jwt": {
+      "secret": "foo"
+    },
+    "github": {
+      "clientId": "github-client-id",
+      "clientSecret": "shhhh-github-secret",
+      "encryptionPassword": "very-shhhhhh-encryption-password"
+    }
+  }
+}

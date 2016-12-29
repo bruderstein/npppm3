@@ -1,5 +1,20 @@
 {
   "couch": {
     "url": "http://localhost:5985/plugins"
+  },
+  "auth": {
+    "jwt": {
+      "algorithm": "HS256",
+      "secret": "&xzkjFVq!fPNODXWSRff@JpHFj3KUIhidpb@Mh^Jc@tSs!yYcZB#OJa@w6Hjy0XZ",
+      "issuer": "npppm.bruderste.in",
+      "accessExpiresIn": "5m",
+      "refreshExpiresIn": "24h",
+      "isSecure": true
+    },
+    "github": {
+      "clientId": "d019f8b0764b2502d08e",
+      "clientSecret": "4e7833ab218c0fe80e637ec89635b8e91c132d06",
+      "encryptionPassword": "5vPM1jv$AO!c98jEKKRgPZjCX%PB@%!lA2kNmATfvhyutFzLXa7hoHSRPPmV*ucl"
+    }
   }
 }

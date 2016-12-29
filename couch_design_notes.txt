@@ -52,3 +52,51 @@ client side, and issueing one big POST with the definition AND new MD5s. That's 
  Easier with a list in the plugin itself (could even manually remove client side?)
 
 
+
+---- Users & Authenticating
+
+Each user is represented by two documents, a '<email>-email' document (e.g. 'user@example.com-email'), type 'user-email',
+and a user UUID document, type 'user'.
+
+The UUID is contained in the email document under the key 'userId'. The user-email document can optionally contain a bcrypt
+password. If it does not, the user can only authenticate via a third party (currently only github, but could be easily
+extended to others)
+
+1. User attempts to authenticate via github
+
+   - Callback to /api/auth/github passes email, username, displayName
+   - Lookup user via email address in couch - '<email>-email' (url encoded)
+     - if that returns not found:
+        - create user-email document '<email>-email' with { userId: <generated-uuid>, type: 'user-email', source: 'github' }
+        - create user document <uuid> with { type: 'user', state: 'await-approval', displayName: <displayName>, email: <email>, github: { username: <username> }
+        - forward this document to authoriseUser(userId)
+
+     - if that returns a document
+       - lookup uuid from returnValue.userId
+         - (assuming that returns the user doc- if not is a 401)
+         - forward this document to authoriseUser(userId)
+
+
+    authoriseUser(userId, redirectUrl)
+         - check state
+          case 'await-approval' -> redirect to /login/awaiting-approval
+          case 'approved' -> create access token, redirect to '/plugins' or to original address
+
+2. User attempts to authenticate via email & password
+  - Lookup user via email address '<email>-email'
+   - if that does not return a doc:
+      - return { authenticationSuccess: false, reason: 'INVALID_CREDENTIALS' }
+
+   - if that returns a doc
+     - check if doc contains bcrypt password & failedLogins < 6 || lastFailedLoginTime > 1 minute ago
+          (if account locked, ie. failedLogins > 6 and lastFailedLoginTime < 1 minute, return { ACCOUNT_LOCKED })
+       - if yes, validate password
+          - if valid
+            - if failedLogins > 0: clear failedLogins and reset lastFailedLoginTime
+            - call authoriseUser(userId, redirectUrl)
+
+          - if invalid
+             - update failed logins and set lastFailedLoginTime to now
+             - return { authenticationSuccess: false, reason: 'INVALID_CREDENTIALS' }
+       - if no, return { authenticationSuccess: false, reason: 'INVALID_CREDENTIALS' }
+
