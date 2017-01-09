@@ -35,7 +35,7 @@ describe('withFieldWrapper', function () {
 
   it('renders the label with a unique id', function () {
     renderer.render(<Wrapped label="foo" />);
-    expect(renderer, 'to contain', <label for={ expect.it('to match', /field-wrapper-[0-9]+/)}>foo</label>)
+    expect(renderer, 'to contain', <label htmlFor={ expect.it('to match', /field-wrapper-[0-9]+/)}>foo</label>)
   });
 
   it('does not pass the label on to the wrapped component', function () {

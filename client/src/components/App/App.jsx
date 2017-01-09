@@ -8,6 +8,7 @@ import styles from '../../styles.css';
 import PluginList from '../PluginList/PluginList';
 import EditPlugin from '../PluginEditor/EditPlugin';
 import NewPlugin from '../PluginEditor/NewPlugin';
+import Login from '../Login/Login';
 import Row from '../Grid/Row';
 
 class App extends Component {
@@ -21,15 +22,25 @@ class App extends Component {
       <Row>
         <Match pattern="/plugins" exactly component={PluginList} />
         <Match pattern="/plugins/new" exactly component={NewPlugin} />
-        <Miss render={ () => {
-          return (<div>
-            <Match pattern="/plugins/:id" component={EditPlugin} />
-            <Miss render={() => <Redirect to="/plugins" />} />
-          </div>);
-        } } />
+        <Match pattern="/login" exactly component={Login} />
+        <Match pattern="/plugins/:id" render={props => {
+          if (props.params.id === 'new') {
+            return <NewPlugin />;
+          }
+          return <EditPlugin {...props} />;
+        }} />
+        <Miss component={NoMatch} />
       </Row>
     );
   }
+}
+
+function NoMatch() {
+  return (
+    <div>
+      <span>Nothing matched!</span>
+    </div>
+  );
 }
 
 function mapDispatchToProps(dispatch) {

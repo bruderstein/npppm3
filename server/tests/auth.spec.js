@@ -17,6 +17,9 @@ const expect = unexpected
 const REFRESH_EXPIRY = ms(config.get('auth.jwt.refreshExpiresIn'));
 const ACCESS_EXPIRY = ms(config.get('auth.jwt.accessExpiresIn'));
 
+const BIG_S3CRET_BCRYPT = '$2a$10$xiGStaPTxwZwE2URau3T6uIr.VsCzhsIY7d2C3rwQanLHtcSzfJy6';
+const BIG_S3CRET_SHA1_BCRYPT = '$2a$10$xDbzy5Lwao46p3ygGxZahuaidVvDH.6fYkJFSc46qPL0HZzaaIufa'; // sha1-bcrypt of 'bigS3cret'
+
 expect.addAssertion('<object> [not] to contain the authorization headers', function (expect, subject) {
   let cookieHeaders = subject.headers && subject.headers['set-cookie'];
   if (!Array.isArray(cookieHeaders)) {
@@ -124,7 +127,8 @@ describe('auth module', function () {
         userId: 'test1234'
       }));
       mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
-        displayName: 'anna'
+        displayName: 'anna',
+        scope: ['login']
       }));
 
       mockDb.insertAsync.returns(Promise.resolve({}));
@@ -150,10 +154,38 @@ describe('auth module', function () {
           _id: expect.it('to match', /^[a-f0-9]+-refresh$/),
           type: 'refresh-token',
           userId: 'test1234',
-          displayName: 'Mrs Unit Test'
+          displayName: 'Mrs Unit Test',
+          scope: ['login']
         }]);
       });
     });
+  });
+
+  describe('with authorised but not yet approved github user', function () {
+
+    beforeEach(() => {
+
+      mockDb.getAsync.withArgs('test@foo.com-email').returns(Promise.resolve({
+        userId: 'test1234'
+      }));
+      mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
+        displayName: 'anna',
+        scope: []
+      }));
+
+      mockDb.insertAsync.returns(Promise.resolve({}));
+    });
+
+    it('returns the access token cookie', function () {
+
+      return inject({
+        method: 'GET',
+        url: '/api/auth/github'
+      }).then(response => {
+        expect(response, 'not to contain the authorization headers');
+      });
+    });
+
   });
 
   describe('with an unknown but valid github user', function () {
@@ -193,7 +225,8 @@ describe('auth module', function () {
           mockDb.insertAsync({
             _id: expect.it('to match', /^[a-f0-9]+/),
             type: 'user',
-            displayName: 'Mrs Unit Test'
+            displayName: 'Mrs Unit Test',
+            scope: []
           });
         });
       });
@@ -211,10 +244,11 @@ describe('auth module', function () {
         userId: 'test1234',
         authType: 'password',
         algorithm: 'sha1-bcrypt',
-        password: '$2a$10$xDbzy5Lwao46p3ygGxZahuaidVvDH.6fYkJFSc46qPL0HZzaaIufa' // sha1-bcrypt of 'bigS3cret'
+        password: BIG_S3CRET_SHA1_BCRYPT
       }));
 
       mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
+        scope: ['login'],
         displayName: 'anna'
       }));
 
@@ -251,6 +285,10 @@ describe('auth module', function () {
 
     it('stores the refresh token', function () {
 
+      mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
+        scope: ['login']
+      }));
+
       return inject({
         method: 'POST',
         url: '/api/auth/signin',
@@ -264,6 +302,7 @@ describe('auth module', function () {
             _id: expect.it('to match', /^[a-f0-9]+-refresh$/),
             userId: 'test1234',
             type: 'refresh-token',
+            scope: ['login'],
             created: Date.now() / 1000  // Date.now() is stubbed
           }
         ]);
@@ -321,7 +360,7 @@ describe('auth module', function () {
         failedLogins: 1,
         userId: 'test1234',
         algorithm: 'sha1-bcrypt',
-        password: '$2a$10$xDbzy5Lwao46p3ygGxZahuaidVvDH.6fYkJFSc46qPL0HZzaaIufa' // sha1-bcrypt of 'bigS3cret'
+        password: BIG_S3CRET_SHA1_BCRYPT
       }));
 
       return inject({
@@ -353,7 +392,7 @@ describe('auth module', function () {
         failedLogins: 5,
         userId: 'test1234',
         algorithm: 'sha1-bcrypt',
-        password: '$2a$10$xDbzy5Lwao46p3ygGxZahuaidVvDH.6fYkJFSc46qPL0HZzaaIufa' // sha1-bcrypt of 'bigS3cret'
+        password: BIG_S3CRET_SHA1_BCRYPT
       }));
 
       return inject({
@@ -387,7 +426,7 @@ describe('auth module', function () {
         accountLocked: Date.now(),
         userId: 'test1234',
         algorithm: 'sha1-bcrypt',
-        password: '$2a$10$xDbzy5Lwao46p3ygGxZahuaidVvDH.6fYkJFSc46qPL0HZzaaIufa' // sha1-bcrypt of 'bigS3cret'
+        password: BIG_S3CRET_SHA1_BCRYPT
       }));
 
       return inject({
@@ -415,14 +454,18 @@ describe('auth module', function () {
           accountLocked: Date.now(),
           userId: 'test1234',
           algorithm: 'sha1-bcrypt',
-          password: '$2a$10$xDbzy5Lwao46p3ygGxZahuaidVvDH.6fYkJFSc46qPL0HZzaaIufa' // sha1-bcrypt of 'bigS3cret'
+          password: BIG_S3CRET_SHA1_BCRYPT
         }));
       });
 
       it('passes a login after 1 minute is up', function () {
 
-        clock.tick(60000);
+        mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
+          displayName: 'Mrs Unit Test',
+          scope: ['login']
+        }));
 
+        clock.tick(60000);
         return inject({
           method: 'POST',
           url: '/api/auth/signin',
@@ -436,6 +479,11 @@ describe('auth module', function () {
       });
 
       it('resets the lock after a successful login after 1 minute is up', function () {
+
+        mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
+          displayName: 'Mrs Unit Test',
+          scope: ['login']
+        }));
 
         clock.tick(60000);
 
@@ -485,6 +533,56 @@ describe('auth module', function () {
     });
   });
 
+  describe('with a user with a bcrypt password', function () {
+
+      beforeEach(() => {
+
+        mockDb.getAsync.withArgs('test@foo.com-email').returns(Promise.resolve({
+          _id: 'test@foo.com-email',
+          _rev: '3-111222',
+          userId: 'test1234',
+          authType: 'password',
+          algorithm: 'bcrypt',
+          password: BIG_S3CRET_BCRYPT
+        }));
+
+        mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
+          scope: ['login'],
+          displayName: 'anna'
+        }));
+
+        mockDb.insertAsync.returns(Promise.resolve({}));
+      });
+
+      it('authorises the user when the password is valid', function () {
+
+        return inject({
+          method: 'POST',
+          url: '/api/auth/signin',
+          payload: {
+            email: 'test@foo.com',
+            password: 'bigS3cret'
+          }
+        }).then(response => {
+          expect(response, 'to contain the authorization headers');
+        });
+      });
+
+      it('does not authorise the user when the password is invalid', function () {
+
+        return inject({
+          method: 'POST',
+          url: '/api/auth/signin',
+          payload: {
+            email: 'test@foo.com',
+            password: 'wrong'
+          }
+        }).then(response => {
+          expect(response, 'not to contain the authorization headers');
+        });
+      });
+  });
+
   describe('jwt authentication', function () {
 
     let token, refresh;
@@ -494,6 +592,7 @@ describe('auth module', function () {
         userId: 'test1234'
       }));
       mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
+        scope: ['login'],
         displayName: 'anna'
       }));
 
@@ -514,14 +613,14 @@ describe('auth module', function () {
     it('authenticates a user with a just-granted token', function () {
       return inject({
         method: 'GET',
-        url: '/api/auth/check',
+        url: '/api/auth',
         headers: {
           authorization: `Bearer ${token}`
         }
       }).then(response => {
         expect(response.statusCode, 'to equal', 200);
         expect(response.result, 'to satisfy', {
-          success: true
+          displayName: 'Mrs Unit Test'
         });
       });
     });
@@ -529,7 +628,7 @@ describe('auth module', function () {
     it('does not update the access token when the access token is still valid', function () {
       return inject({
         method: 'GET',
-        url: '/api/auth/check',
+        url: '/api/auth',
         headers: {
           authorization: `Bearer ${token}`,
           'x-refresh-token': refresh
@@ -542,7 +641,7 @@ describe('auth module', function () {
     it('returns 401 when the token is invalid', function () {
       return inject({
         method: 'GET',
-        url: '/api/auth/check',
+        url: '/api/auth',
         headers: {
           authorization: 'Bearer abcccccccccc',
           'x-refresh-token': refresh
@@ -559,10 +658,14 @@ describe('auth module', function () {
 
         clock.tick(5 * 60 * 1000);
         mockDb.getAsync.reset();
-        mockDb.getAsync.returns(Promise.resolve({ userId: 'test1234', created: new Date(2016, 1, 1).getTime() / 1000 }));
+        mockDb.getAsync.returns(Promise.resolve({
+          userId: 'test1234',
+          created: new Date(2016, 1, 1).getTime() / 1000,
+          displayName: 'Mrs Unit Test'
+        }));
         return inject({
           method: 'GET',
-          url: '/api/auth/check',
+          url: '/api/auth',
           headers: {
             authorization: `Bearer ${token}`,
             'x-refresh-token': refresh
@@ -575,7 +678,7 @@ describe('auth module', function () {
       it('returns success', function () {
         expect(response.statusCode, 'to equal', 200);
         expect(response.result, 'to satisfy', {
-          success: true
+          displayName: 'Mrs Unit Test'
         });
       });
 
@@ -602,7 +705,7 @@ describe('auth module', function () {
         clock.tick(REFRESH_EXPIRY);
         return inject({
           method: 'GET',
-          url: '/api/auth/check',
+          url: '/api/auth',
           headers: {
             authorization: `Bearer ${token}`,
             'x-refresh-token': refresh
@@ -633,7 +736,7 @@ describe('auth module', function () {
         clock.tick(ACCESS_EXPIRY);
         return inject({
           method: 'GET',
-          url: '/api/auth/check',
+          url: '/api/auth',
           headers: {
             authorization: `Bearer ${token}`,
             'x-refresh-token': refresh
@@ -652,6 +755,154 @@ describe('auth module', function () {
         expect(response.headers['set-cookie'], 'to be falsy');
       });
 
+    });
+
+  });
+
+  describe('signup with email/password', function () {
+
+    it('creates the email and user docs', function () {
+      mockDb.insertAsync.returns(Promise.resolve({}));
+
+      return inject({
+        method: 'POST',
+        url: '/api/auth/signup',
+        payload: {
+          email: 'test@foo.com',
+          password: 'bigS3cret',
+          displayName: 'Mrs Unit Test'
+        }
+      }).then(() => {
+        expect(mockDb.insertAsync, 'to have calls satisfying', function () {
+          mockDb.insertAsync({
+            _id: 'test@foo.com-email',
+            type: 'user-email',
+            userId: expect.it('to match', /[a-z0-9-]{36}/),
+            authType: 'password',
+            algorithm: 'bcrypt'
+          });
+          mockDb.insertAsync({
+            _id: expect.it('to match', /[a-z0-9-]{36}/),
+            type: 'user',
+            displayName: 'Mrs Unit Test',
+            email: 'test@foo.com',
+            scope: []
+          });
+        });
+      });
+    });
+
+    it('returns a success response', function () {
+
+        mockDb.insertAsync.returns(Promise.resolve({}));
+
+        return inject({
+          method: 'POST',
+          url: '/api/auth/signup',
+          payload: {
+            email: 'test@foo.com',
+            password: 'bigS3cret',
+            displayName: 'Mrs Unit Test'
+          }
+        }).then(response => {
+          expect(response.result, 'to equal', { success: true });
+        });
+    });
+
+    describe('when signing up with an existing user', function () {
+
+
+      beforeEach(function () {
+
+        mockDb.insertAsync
+          .withArgs(sinon.match({ _id: 'test@foo.com-email' }))
+          .returns(Promise.reject({ statusCode: 409 }));
+      });
+
+      it('returns success', function () {
+        // TODO: We'll send an email to the user that there was a repeated signup attempt for their user
+        return inject({
+          method: 'POST',
+          url: '/api/auth/signup',
+          payload: {
+            email: 'test@foo.com',
+            password: 'bigS3cret',
+            displayName: 'Mrs Unit Test'
+          }
+        }).then(response => {
+          expect(response.result, 'to equal', { success: true });
+        });
+      });
+
+    });
+  });
+
+  describe('/api/auth/approve', function () {
+    it('adds the login scope to the given user', function () {
+      mockDb.getAsync.withArgs('test@foo.com-email').returns(Promise.resolve({
+        _id: 'test@foo.com-email',
+        _rev: '3-111222',
+        scope: []
+      }));
+      mockDb.insertAsync.returns(Promise.resolve({}));
+
+      return inject({
+        method: 'POST',
+        url: '/api/auth/approve?email=test@foo.com',
+        credentials: { displayName: 'admin', scope: ['login', 'admin'] }
+      }).then(() => {
+        expect(mockDb.insertAsync, 'to have calls satisfying', function () {
+          mockDb.insertAsync({
+            _id: 'test@foo.com-email',
+            _rev: '3-111222',
+            scope: ['login']
+          });
+        });
+      });
+    });
+
+    it('does not add the login scope to a user with an existing login scope', function () {
+      mockDb.getAsync.withArgs('test@foo.com-email').returns(Promise.resolve({
+        _id: 'test@foo.com-email',
+        _rev: '3-111222',
+        scope: ['login']
+      }));
+      mockDb.insertAsync.returns(Promise.resolve({}));
+
+      return inject({
+        method: 'POST',
+        url: '/api/auth/approve?email=test@foo.com',
+        credentials: { displayName: 'admin', scope: ['login', 'admin'] }
+      }).then(() => {
+        expect(mockDb.insertAsync, 'was not called');
+      });
+    });
+
+    it('does not add the login scope to a user in the `rejected` scope', function () {
+      mockDb.getAsync.withArgs('test@foo.com-email').returns(Promise.resolve({
+        _id: 'test@foo.com-email',
+        _rev: '3-111222',
+        scope: ['rejected']
+      }));
+      mockDb.insertAsync.returns(Promise.resolve({}));
+
+      return inject({
+        method: 'POST',
+        url: '/api/auth/approve?email=test@foo.com',
+        credentials: { displayName: 'admin', scope: ['login', 'admin'] }
+      }).then(() => {
+        expect(mockDb.insertAsync, 'was not called');
+      });
+    });
+
+    it('fails with a non admin user', function () {
+      return inject({
+        method: 'POST',
+        url: '/api/auth/approve?email=test@foo.com',
+        credentials: { displayName: 'normalUser', scope: ['login']}
+      }).then(response => {
+        expect(response.statusCode, 'to equal', 403);
+      });
     });
   });
 });

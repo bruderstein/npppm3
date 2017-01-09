@@ -14,7 +14,7 @@ export default function withFieldWrapper(WrappedComponent) {
       labelSize: PropTypes.number,
       label: PropTypes.string.isRequired,
       docs: PropTypes.string
-    }
+    };
 
     constructor(props) {
       super(props);
@@ -27,7 +27,7 @@ export default function withFieldWrapper(WrappedComponent) {
       return (
         <Row>
           <Cell large={labelSize || "2"} small="12">
-            <label for={'field-wrapper-' + this.uniqueId}>{label}</label>
+            <label htmlFor={'field-wrapper-' + this.uniqueId}>{label}</label>
           </Cell>
           <Cell large={(labelSize && (12-labelSize)) || 10} small="12">
             <InfoWrapper docs={docs}>

@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Immutable from 'immutable';
 import DownloadStep from './DownloadStep';
 
 const stepComponents = {
@@ -9,10 +10,27 @@ function UnknownStep({ step }) {
   return <div>Unknown step type "{step.get('type')}"</div>
 }
 
-export function Step({ step }) {
-  const stepType = step.get('type'); // TODO: need to check the definition of the steps for this
+export default class Step extends Component {
+  constructor(props) {
+    super(props);
+    this.onFieldChange = this.onFieldChange.bind(this);
+  }
 
-  const StepComponent = stepComponents[stepType] || UnknownStep;
+  static propTypes = {
+    stepNumber: PropTypes.number.required,
+    step: PropTypes.instanceOf(Immutable.Map).required
+  };
 
-  return <StepComponent step={step} />;
+  onFieldChange(fieldName, value) {
+    this.props.onFieldChange(this.props.stepNumber, fieldName, value);
+  }
+
+  render() {
+    const { step } = this.props;
+    const stepType = step.get('type');
+
+    const StepComponent = stepComponents[stepType] || UnknownStep;
+
+    return <StepComponent step={step} onFieldChange={this.onFieldChange}/>;
+  }
 }

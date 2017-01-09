@@ -18,7 +18,7 @@ class EditInput extends Component {
     const { plugin, field } = this.props;
     const value = plugin.get(field);
     return (
-      <DebouncedInput onChange={this.onChange} initialValue={value} />
+      <DebouncedInput onChange={this.onChange} defaultValue={value} />
     );
   }
 }

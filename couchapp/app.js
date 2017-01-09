@@ -99,3 +99,13 @@ ddoc.views.publish_history = {
     },
     reduce: findNewest
 };
+
+ddoc.views['user-approvals'] = {
+  map: function (doc) {
+    if (doc.type === 'user-email' &&
+      doc.groups.indexOf('login') === -1 &&
+      doc.groups.indexOf('rejected') === -1) {
+      emit(doc.email);
+    }
+  }
+};

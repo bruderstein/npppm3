@@ -44,6 +44,16 @@ if [ "$PLUGINS_EXISTS" != "plugins" ]; then
   curl -sX PUT http://${COUCH_AUTH}@${COUCH_HOST}/plugins;
 fi
 
+ADMIN_USER_EXISTS=$(curl -s http://${COUCH_AUTH}@${COUCH_HOST}/plugins/admin-email | jq -r .email)
+
+if [ "$ADMIN_USER_EXISTS" != "admin" ]; then
+  echo "Create npppm admin user (username: admin, password: secret)"
+  curl -sX PUT http://${COUCH_AUTH}@${COUCH_HOST}/plugins/admin-email -d '{ "email": "admin", "type":"user-email", "authType":"password","algorithm":"bcrypt", "password":"$2a$10$ssibQHTWe2GwCLPbTeyT.eSzBmlEipAwoh8mjeaMxlj/Bk8ouMJ0C", "userId": "admin-user" }'
+
+  curl -sX PUT http://${COUCH_AUTH}@${COUCH_HOST}/plugins/admin-user -d '{ "email": "admin", "type":"user", "displayName": "admin" }';
+fi
+
+
 SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo Updating couchapp...

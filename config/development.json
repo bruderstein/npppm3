@@ -1,0 +1,8 @@
+{
+  "auth": {
+    "jwt": {
+      "secret": "some-dev-secret",
+      "isSecure": false
+    }
+  }
+}

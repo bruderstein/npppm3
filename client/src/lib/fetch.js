@@ -1,7 +1,7 @@
 import 'isomorphic-fetch';
 
 export function fetchJson(url) {
-  return fetch(url)
+  return standardFetch(url)
     .then((response) => {
       return response.json();
     }).then(json => {
@@ -9,15 +9,32 @@ export function fetchJson(url) {
     });
 }
 
-export function fetch(url, options) {
+const standardFetch = function (url, options) {
+  options = options || {};
+  options.headers = options.headers || {};
+
   if (!options.type) {
     options.type = 'application/json';
   }
+
   if (typeof options.body === 'object') {
     options.body = JSON.stringify(options.body);
-    options.headers = options.headers || {};
     options.headers['content-type'] = options.headers['content-type'] || 'application/json';
   }
 
+  // Parse cookies
+  const cookies = document.cookie.split(';').map(part => part.split('=')).reduce((all, [name, value]) => {
+    all[name.trim()] = value && value.trim();
+    return all;
+  }, {});
+
+  // Add authentication headers
+  if (cookies.token && cookies.refresh) {
+    options.headers['authorization'] = 'Bearer ' + cookies.token;
+    options.headers['x-refresh-token'] = cookies.refresh;
+  }
+
   return fetch(url, options);
-}
+};
+
+export { standardFetch as fetch };

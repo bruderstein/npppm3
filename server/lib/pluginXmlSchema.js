@@ -10,6 +10,8 @@ module.exports = {
     latestUpdate: { $content: false },
     stability: { $content: false },
     isLibrary: { $content: false },
+    minVersion: { $content: false },
+    maxVersion: { $content: false },
     dependencies: {
       $arrayElement: true
     },
@@ -25,17 +27,36 @@ module.exports = {
       $arrayElement: true,
       $content: false,
       unicode: {
-        $arrayElement: true,
+        $arrayElement: 'type',
         $content: false,
         download: { $content: 'url' }
       },
       x64: {
-        $arrayElement: true,
+        $arrayElement: 'type',
         $content: false,
         download: { $content: 'url' }
       },
       ansi: {
-        $arrayElement: true,
+        $arrayElement: 'type',
+        $content: false,
+        download: { $content: 'url' }
+      }
+    },
+    remove: {
+      $arrayElement: true,
+      $content: false,
+      unicode: {
+        $arrayElement: 'type',
+        $content: false,
+        download: { $content: 'url' }
+      },
+      x64: {
+        $arrayElement: 'type',
+        $content: false,
+        download: { $content: 'url' }
+      },
+      ansi: {
+        $arrayElement: 'type',
         $content: false,
         download: { $content: 'url' }
       }

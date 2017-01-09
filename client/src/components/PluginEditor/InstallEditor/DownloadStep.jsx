@@ -1,6 +1,9 @@
 import React, { Component, PropTypes } from 'react';
+import { FullRow, Row, Cell } from '../../Grid';
+import File from './File';
+import styles from './download-step.css'
 
-export class DownloadStep extends Component {
+export default class DownloadStep extends Component {
   constructor(props) {
     super(props);
     this.state = { url: props.step.get('url') };
@@ -11,12 +14,15 @@ export class DownloadStep extends Component {
     this.setState({
       url: e.target.value
     });
+
+    this.props.onFieldChange('url', e.target.value);
   }
 
   render() {
 
     const { url } = this.state;
-    const filesAvailable = this.step.get('filesAvailable') || [];
+    const { step } = this.props;
+    const filesAvailable = step.get('filesAvailable') || [];
     return (
       <div className={styles.downloadStep}>
       <Row>

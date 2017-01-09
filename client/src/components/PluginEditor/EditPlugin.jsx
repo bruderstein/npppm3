@@ -4,6 +4,7 @@ import styles from './plugin-editor.css';
 
 import { fetchPlugin, fieldChanged } from '../../actions'
 
+import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
 import PluginEditor from './PluginEditor';
 
 class EditPlugin extends Component {
@@ -18,6 +19,12 @@ class EditPlugin extends Component {
   render() {
     const { plugin, onFieldChange } = this.props;
 
+    if (!plugin) {
+      return (
+        <LoadingIndicator />
+      );
+    }
+
     return (
       <PluginEditor plugin={plugin} onFieldChange={onFieldChange} />
     );
@@ -26,7 +33,7 @@ class EditPlugin extends Component {
 
 function mapStateToProps(state, ownProps) {
   return {
-    plugin: state && state.pluginsById && state.pluginsById[ownProps.params.id]
+    plugin: state && state.pluginsById && state.pluginsById.get(ownProps.params.id)
   };
 }
 
