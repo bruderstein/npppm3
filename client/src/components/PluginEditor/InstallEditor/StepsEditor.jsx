@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import AddStepButton from './AddStepButton';
 import { connect } from 'react-redux';
 import { installStepChange, installStepAdd } from '../../../actions';
 
@@ -25,10 +26,10 @@ class StepsEditor extends Component {
     onFieldChange({ pluginId, installRemove, installType, stepNumber, field, value })
   }
 
-  onAddStep() {
+  onAddStep(type) {
     const { onAddStep, pluginId, installRemove, installType } = this.props;
     // TODO: This will be a state change to show a dropdown, or we'll have the type as a parameter or something...
-    onAddStep({ pluginId, installRemove, installType, type: 'download' });
+    onAddStep({ pluginId, installRemove, installType, type });
   }
 
   render () {
@@ -38,7 +39,10 @@ class StepsEditor extends Component {
         <ul className={styles.stepsEditor}>
           {steps.map((step, index) => <Step step={step} onFieldChange={this.onFieldChange} stepNumber={index} />)}
         </ul>
-        <button onClick={this.onAddStep}>Add Step</button>
+        <AddStepButton type="download" icon="fa-download" title="Add download step" onClick={this.onAddStep} />
+        <AddStepButton type="copy" icon="fa-copy" title="Add copy step" onClick={this.onAddStep} />
+        <AddStepButton type="run" icon="fa-run" title="Add run step" onClick={this.onAddStep} />
+        <AddStepButton type="delete" icon="fa-delete" title="Add delete step" onClick={this.onAddStep} />
       </div>
     );
 

@@ -2,7 +2,7 @@
 import {
   PLUGIN_FETCHED, PLUGIN_CREATED, PLUGIN_FIELD_CHANGED,
   INSTALL_STEP_FIELD_CHANGED, INSTALL_STEP_ADD,
-  PLUGIN_SAVED, FILES_FETCHED_FOR_DOWNLOAD
+  PLUGIN_SAVED, FILE_LIST_FETCHED
 } from '../actions';
 
 import Immutable from 'immutable';
@@ -29,13 +29,13 @@ export default function pluginsById(state = Immutable.Map(), action) {
 
     case INSTALL_STEP_ADD: {
       const { pluginId, installRemove, installType, type } = action.payload;
-      return state  // TODO validate this works
+      return state
         .mergeDeep({ [pluginId]: { [installRemove]: { [installType]: [] } } })
          .updateIn([pluginId, installRemove, installType],
            steps => steps.push(Immutable.Map({ type })));
     }
 
-    case FILES_FETCHED_FOR_DOWNLOAD: {
+    case FILE_LIST_FETCHED: {
       const { pluginId, installType, url, files } = action.payload;
       const newSteps = state.getIn([pluginId, 'install', installType])
         .map(step => {

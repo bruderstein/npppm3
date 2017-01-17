@@ -11,6 +11,7 @@ const INSTALL_STEP_FIELD_CHANGED = 'INSTALL_STEP_FIELD_CHANGED';
 const INSTALL_STEP_ADD = 'INSTALL_STEP_ADD';
 const PLUGIN_SAVED = 'PLUGIN_SAVED';
 const FETCH_ERROR = 'FETCH_ERROR';
+const FILE_LIST_FETCHED = 'FILE_LIST_FETCHED';
 
 const login = function (email, password) {
 
@@ -102,6 +103,39 @@ const saveNewPlugin = function (plugin) {
   });
 };
 
+const savePlugin = function (pluginId, plugin) {
+
+  return fetch('/api/plugins/' + pluginId, {
+    method: 'PUT',
+    body: {
+      definition: plugin.toJS()
+    }
+  }).then(response => {
+    return {
+      type: PLUGIN_SAVED,
+      payload: { response }
+    };
+  });
+};
+
+const fetchFileList = function (pluginId, url) {
+
+  return fetchJson('/api/files', {
+    method: 'POST',
+    body: {
+      url: url
+    }
+  }).then(response => {
+    return {
+      type: FILE_LIST_FETCHED,
+      payload: {
+        url,
+        files: response.files
+      }
+    };
+  });
+};
+
 export {
   login,
   fetchPluginList,
@@ -110,7 +144,9 @@ export {
   fieldChanged,
   installStepChange,
   installStepAdd,
-  saveNewPlugin
+  saveNewPlugin,
+  savePlugin,
+  fetchFileList
 }
 
 export {
@@ -121,5 +157,6 @@ export {
   PLUGIN_FIELD_CHANGED,
   INSTALL_STEP_FIELD_CHANGED,
   INSTALL_STEP_ADD,
-  PLUGIN_SAVED
+  PLUGIN_SAVED,
+  FILE_LIST_FETCHED
 };

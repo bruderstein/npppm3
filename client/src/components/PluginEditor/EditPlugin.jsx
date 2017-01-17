@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import styles from './plugin-editor.css';
 
-import { fetchPlugin, fieldChanged } from '../../actions'
+import { savePlugin, fetchPlugin, fieldChanged } from '../../actions'
 
 import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
 import PluginEditor from './PluginEditor';
@@ -14,6 +14,12 @@ class EditPlugin extends Component {
     if (!props.plugin) {
       props.fetchPlugin();
     }
+    this.onSave = this.onSave.bind(this);
+  }
+
+  onSave() {
+    const { onSave, plugin } = this.props;
+    onSave(plugin);
   }
 
   render() {
@@ -26,7 +32,10 @@ class EditPlugin extends Component {
     }
 
     return (
-      <PluginEditor plugin={plugin} onFieldChange={onFieldChange} />
+      <main>
+        <PluginEditor plugin={plugin} onFieldChange={onFieldChange} />
+        <button onClick={this.onSave}>Save</button>
+      </main>
     );
   }
 }
@@ -40,7 +49,8 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch, ownProps) {
   return {
     fetchPlugin: () => dispatch(fetchPlugin(ownProps.params.id)),
-    onFieldChange: (field, value) => dispatch(fieldChanged(ownProps.params.id, field, value))
+    onFieldChange: (field, value) => dispatch(fieldChanged(ownProps.params.id, field, value)),
+    onSave: (plugin) => dispatch(savePlugin(ownProps.params.id, plugin))
   }
 }
 

@@ -1,9 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import DownloadStep from './DownloadStep';
+import CopyStep from './CopyStep';
+
 
 const stepComponents = {
-  download: DownloadStep
+  download: DownloadStep,
+  copy: CopyStep
 };
 
 function UnknownStep({ step }) {
