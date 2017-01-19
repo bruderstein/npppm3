@@ -17,8 +17,9 @@ import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
 export default class PluginEditor extends Component {
 
   render() {
-    const { plugin, onFieldChange } = this.props;
-    const definition = plugin.get('definition');
+    const { onFieldChange } = this.props;
+    const plugin = this.props.plugin;
+    const definition = plugin.get('definition') || Immutable.Map();
 
     return (
       <div className={styles.pluginEditor}>
@@ -132,7 +133,7 @@ export default class PluginEditor extends Component {
         </Row>
         <FullRow>
           <AliasInput label="Aliases"
-                      aliases={definition.get('aliases')}
+                      aliases={definition.get('aliases') || Immutable.List()}
                       onFieldChange={onFieldChange}
                       docs={
                         "If the plugin has changes its name (that is, the return value from `getName()` has changed in " +

@@ -1,7 +1,7 @@
 import 'isomorphic-fetch';
 
-export function fetchJson(url) {
-  return standardFetch(url)
+export function fetchJson(url, options) {
+  return standardFetch(url, options)
     .then((response) => {
       return response.json();
     }).then(json => {

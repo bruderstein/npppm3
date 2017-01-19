@@ -12,7 +12,7 @@ export default class AddStepButton extends Component {
 
   render() {
     return (
-      <button onClick={this.onClick} ><i className={'fa ' + this.props.icon} /></button>
+      <button onClick={this.onClick} ><i className={'fa ' + this.props.icon} />{this.props.type}</button>
     );
   }
 }

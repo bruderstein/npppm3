@@ -29,11 +29,11 @@ export default class Step extends Component {
   }
 
   render() {
-    const { step } = this.props;
+    const { step, onFieldChange, ...restProps } = this.props;
     const stepType = step.get('type');
 
     const StepComponent = stepComponents[stepType] || UnknownStep;
 
-    return <StepComponent step={step} onFieldChange={this.onFieldChange}/>;
+    return <StepComponent step={step} onFieldChange={this.onFieldChange} {...restProps} />;
   }
 }

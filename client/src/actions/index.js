@@ -118,7 +118,7 @@ const savePlugin = function (pluginId, plugin) {
   });
 };
 
-const fetchFileList = function (pluginId, url) {
+const fetchFileList = function ({ pluginId, installRemove, installType, url }) {
 
   return fetchJson('/api/files', {
     method: 'POST',
@@ -129,7 +129,10 @@ const fetchFileList = function (pluginId, url) {
     return {
       type: FILE_LIST_FETCHED,
       payload: {
+        pluginId,
         url,
+        installRemove,
+        installType,
         files: response.files
       }
     };

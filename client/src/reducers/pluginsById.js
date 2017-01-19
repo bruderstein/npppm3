@@ -17,6 +17,7 @@ export default function pluginsById(state = Immutable.Map(), action) {
 
     case PLUGIN_FIELD_CHANGED: {
       const { pluginId, field, value } = action.payload;
+      
       return state.setIn([pluginId, field], value);
     }
 
@@ -36,8 +37,8 @@ export default function pluginsById(state = Immutable.Map(), action) {
     }
 
     case FILE_LIST_FETCHED: {
-      const { pluginId, installType, url, files } = action.payload;
-      const newSteps = state.getIn([pluginId, 'install', installType])
+      const { pluginId, installType, installRemove, url, files } = action.payload;
+      const newSteps = state.getIn([pluginId, installRemove, installType], Immutable.List())
         .map(step => {
           if (step.get('type') === 'download' && step.get('url') === url) {
             return step.set('filesAvailable', files);
@@ -45,7 +46,7 @@ export default function pluginsById(state = Immutable.Map(), action) {
           return step;
         });
 
-      return state.setIn([pluginId, 'install', installType], newSteps);
+      return state.setIn([pluginId, installRemove, installType], newSteps);
     }
 
     case PLUGIN_SAVED: {

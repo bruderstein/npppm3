@@ -21,7 +21,6 @@ class App extends Component {
     return (
       <Row>
         <Match pattern="/plugins" exactly component={PluginList} />
-        <Match pattern="/plugins/new" exactly component={NewPlugin} />
         <Match pattern="/login" exactly component={Login} />
         <Match pattern="/plugins/:id" render={props => {
           if (props.params.id === 'new') {

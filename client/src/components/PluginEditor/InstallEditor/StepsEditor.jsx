@@ -33,16 +33,25 @@ class StepsEditor extends Component {
   }
 
   render () {
-    const { steps } = this.props;
+    const { steps, pluginId, installRemove, installType } = this.props;
     return (
       <div>
         <ul className={styles.stepsEditor}>
-          {steps.map((step, index) => <Step step={step} onFieldChange={this.onFieldChange} stepNumber={index} />)}
+          {steps.map((step, index) =>
+            <Step key={index}
+                  step={step}
+                  onFieldChange={this.onFieldChange}
+                  stepNumber={index}
+                  pluginId={pluginId}
+                  installType={installType}
+                  installRemove={installRemove}
+            />)
+          }
         </ul>
-        <AddStepButton type="download" icon="fa-download" title="Add download step" onClick={this.onAddStep} />
-        <AddStepButton type="copy" icon="fa-copy" title="Add copy step" onClick={this.onAddStep} />
-        <AddStepButton type="run" icon="fa-run" title="Add run step" onClick={this.onAddStep} />
-        <AddStepButton type="delete" icon="fa-delete" title="Add delete step" onClick={this.onAddStep} />
+        <AddStepButton type="download" icon="fa-download" title="Add download step" onAddStep={this.onAddStep} />
+        <AddStepButton type="copy" icon="fa-copy" title="Add copy step" onAddStep={this.onAddStep} />
+        <AddStepButton type="run" icon="fa-run" title="Add run step" onAddStep={this.onAddStep} />
+        <AddStepButton type="delete" icon="fa-delete" title="Add delete step" onAddStep={this.onAddStep} />
       </div>
     );
 

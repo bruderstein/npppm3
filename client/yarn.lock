@@ -4472,6 +4472,7 @@ unexpected-htmllike-testrenderer-adapter@^1.0.0:
   resolved "https://registry.npmjs.org/unexpected-htmllike-testrenderer-adapter/-/unexpected-htmllike-testrenderer-adapter-1.0.0.tgz#ee99cd6334652a8db729c5ab7daef4f2dea1c7da"
   dependencies:
     object-assign "^4.0.1"
+    react "^0.14.0 || ^15.0.0"
 
 unexpected-htmllike@^2.1.2:
   version "2.1.2"

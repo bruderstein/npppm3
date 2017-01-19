@@ -9,13 +9,13 @@ COUCH_AUTH=admin:secret
 echo Waiting for couchdb to start...
 set +e
 COUCH_RUNNING=$(curl -s http://${COUCH_HOST}/ | jq .couchdb)
-while [ -n $COUCH_RUNNING ]; do
+while [ "X${COUCH_RUNNING}X" == "XX" ]; do
   COUCH_RUNNING=$(curl -s http://${COUCH_HOST}/)
   sleep 1;
 done
 set -e
 
-echo Couchdb started.
+echo Couchdb started. ${COUCH_RUNNING}
 
 USERS_EXISTS=$(curl -s http://${COUCH_HOST}/_users | jq -r .db_name)
 
@@ -50,7 +50,7 @@ if [ "$ADMIN_USER_EXISTS" != "admin" ]; then
   echo "Create npppm admin user (username: admin, password: secret)"
   curl -sX PUT http://${COUCH_AUTH}@${COUCH_HOST}/plugins/admin-email -d '{ "email": "admin", "type":"user-email", "authType":"password","algorithm":"bcrypt", "password":"$2a$10$ssibQHTWe2GwCLPbTeyT.eSzBmlEipAwoh8mjeaMxlj/Bk8ouMJ0C", "userId": "admin-user" }'
 
-  curl -sX PUT http://${COUCH_AUTH}@${COUCH_HOST}/plugins/admin-user -d '{ "email": "admin", "type":"user", "displayName": "admin" }';
+  curl -sX PUT http://${COUCH_AUTH}@${COUCH_HOST}/plugins/admin-user -d '{ "email": "admin", "type":"user", "displayName": "admin", "scope":["admin","login"] }';
 fi
 
 

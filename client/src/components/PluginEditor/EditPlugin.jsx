@@ -25,7 +25,7 @@ class EditPlugin extends Component {
   render() {
     const { plugin, onFieldChange } = this.props;
 
-    if (!plugin) {
+    if (!this.props.plugin) {
       return (
         <LoadingIndicator />
       );

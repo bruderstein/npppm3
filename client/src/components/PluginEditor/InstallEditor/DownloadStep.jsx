@@ -1,11 +1,14 @@
 import React, { Component, PropTypes } from 'react';
-import { FullRow, Row, Cell } from '../../Grid';
+import { fetchFileList } from '../../../actions';
+
 import File from './File';
+import { FullRow, Row, Cell } from '../../Grid';
+import { connect } from 'react-redux';
 import styles from './steps.css'
 
 let uniqueId = 1;
 
-export default class DownloadStep extends Component {
+class DownloadStep extends Component {
   constructor(props) {
     super(props);
     this.state = { url: props.step.get('url') };
@@ -15,12 +18,20 @@ export default class DownloadStep extends Component {
   }
 
   onUrlChange(e) {
+    // TODO: do we need the url in the state as well? Only if we debounce the state change...
     this.setState({
       url: e.target.value
     });
 
     this.props.onFieldChange('url', e.target.value);
-    // TODO: this.props.fetchFileList
+    if (this.urlChangeTimeout) {
+      clearTimeout(this.urlChangeTimeout);
+      this.urlChangeTimeout = null;
+    }
+    
+    this.urlChangeTimeout = setTimeout(() => {
+      this.props.fetchFileList(this.state.url);
+    }, 500);
   }
 
   render() {
@@ -50,3 +61,15 @@ export default class DownloadStep extends Component {
     );
   }
 }
+
+function mapDispatchToProps(dispatch, ownProps) {
+  
+  return {
+    fetchFileList: (url) => {
+      const { pluginId, installRemove, installType }  = ownProps;
+      dispatch(fetchFileList({ pluginId: pluginId, installRemove, installType, url }))
+    }
+  };
+}
+
+export default connect(null, mapDispatchToProps)(DownloadStep);

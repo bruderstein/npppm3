@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { login } from '../../actions';
+import styles from '../../styles.css';
 
 import { FullRow, Row, Cell } from '../Grid';
 
@@ -52,7 +53,7 @@ class Login extends Component {
             <label htmlFor="password">Password</label>
           </Cell>
           <Cell large="10">
-            <input type="text" id="password" value={password} onChange={this.onPasswordChange} />
+            <input type="password" id="password" value={password} onChange={this.onPasswordChange} />
           </Cell>
         </Row>
         <FullRow>
