@@ -52,9 +52,7 @@ class DownloadStep extends Component {
         </Row>
         <FullRow>
           <ul className={styles.filesList}>
-            {filesAvailable.map(file => {
-              <File file={file} />
-            })}
+            {filesAvailable.map(file => <File {...file} />)}
           </ul>
         </FullRow>
       </fieldset>
