@@ -20,12 +20,18 @@ const login = function (email, password) {
     body: { email, password },
     credentials: 'include'
   }).then(response => {
-    if (response.statusCode === 200) {
-      browserHistory.push('/plugins');
-      return {
-        type: LOGGED_IN
-      }
+    if (response.status === 200) {
+      return response.json();
     }
+    throw new Error('Non-200 from signin request');
+  }).then(result => {
+      return {
+        type: LOGGED_IN,
+        payload: {
+          email: result.email,
+          name: result.name
+        }
+      };
   });
 };
 

@@ -13,9 +13,15 @@ class Login extends Component {
       password: ''
     };
 
+    this.checkLogin();
+
     this.onEmailChange = this.onEmailChange.bind(this);
     this.onPasswordChange = this.onPasswordChange.bind(this);
     this.onLoginClick = this.onLoginClick.bind(this);
+  }
+
+  componentWillReceiveProps(newProps) {
+    this.checkLogin(newProps);
   }
 
   onEmailChange(e) {
@@ -33,6 +39,13 @@ class Login extends Component {
   onLoginClick() {
     const { email, password } = this.state;
     this.props.onLogin(email, password);
+  }
+
+  checkLogin(props) {
+    if (props && props.isLoggedIn) {
+      // TODO: What is the API here?
+      props.router.push('/plugins');
+    }
   }
 
   render() {
@@ -67,7 +80,8 @@ class Login extends Component {
 
 function mapStateToProps(state) {
   // TODO: Login failed message
-  return {};
+  return {
+  };
 }
 
 function mapDispatchToProps(dispatch) {
