@@ -3,9 +3,9 @@ import React from 'react';
 
 import styles from './file.css';
 
-export default function File({ name, highlight, hash, validated, validationRequired }) {
+export default function File({ name, highlighted, hash, validated, validationRequired }) {
   const classes = classnames({
-    [styles.highlight]: highlight,
+    [styles.highlighted]: highlighted,
     [styles.validated]: validated,
     [styles.validationRequired]: validationRequired
   });

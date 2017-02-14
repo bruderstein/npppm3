@@ -151,7 +151,7 @@ export default class PluginEditor extends Component {
                              }
           />
         </FullRow>
-        <InstallEditor installSteps={plugin.get('install') || Immutable.Map()}
+        <InstallEditor installSteps={definition.get('install') || Immutable.Map()}
                        installRemove="install"
                        pluginId={plugin.get('pluginId')}
         />

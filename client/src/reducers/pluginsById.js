@@ -6,6 +6,7 @@ import {
 } from '../actions';
 
 import Immutable from 'immutable';
+import minimatch from 'minimatch';
 
 export default function pluginsById(state = Immutable.Map(), action) {
   switch (action.type) {
@@ -18,37 +19,44 @@ export default function pluginsById(state = Immutable.Map(), action) {
     case PLUGIN_FIELD_CHANGED: {
       const { pluginId, field, value } = action.payload;
       
-      return state.setIn([pluginId, field], value);
+      return state.setIn([pluginId, 'definition', field], value);
     }
 
     case INSTALL_STEP_FIELD_CHANGED: {
       const { pluginId, installRemove, installType, stepNumber, field, value } = action.payload;
 
-      return state
-        .setIn([pluginId, installRemove, installType, stepNumber, field], value);
+      state = state
+        .updateIn([pluginId, 'definition', installRemove, installType, stepNumber], (step) => {
+        if (step.get('type') === 'copy' && field === 'from' && step.get('inheritedFiles')) {
+          const pattern = patternToRegex(value);
+          step = step.update('inheritedFiles', (files) => highlightInheritedFiles(pattern, files));
+        }
+        return step.set(field, value)
+      });
+
+      return state;
     }
 
     case INSTALL_STEP_ADD: {
       const { pluginId, installRemove, installType, type } = action.payload;
       state = state
-        .mergeDeep({ [pluginId]: { [installRemove]: { [installType]: [] } } })
-         .updateIn([pluginId, installRemove, installType],
+        .mergeDeep({ [pluginId]: { definition: { [installRemove]: { [installType]: [] } } } })
+         .updateIn([pluginId, 'definition', installRemove, installType],
            steps => steps.push(Immutable.Map({ type })));
-      state = state.updateIn([ pluginId, installRemove, installType ], steps => inheritFilesToCopySteps(steps));
+      state = state.updateIn([ pluginId, 'definition', installRemove, installType ], steps => inheritFilesToCopySteps(steps));
       return state;
     }
 
     case FILE_LIST_FETCHED: {
       const { pluginId, installType, installRemove, url, files } = action.payload;
-      const newSteps = state.getIn([pluginId, installRemove, installType], Immutable.List())
+      const newSteps = state.getIn([pluginId, 'definition', installRemove, installType], Immutable.List())
         .map(step => {
           if (step.get('type') === 'download' && step.get('url') === url) {
-            return step.set('filesAvailable', files);
+            return step.set('filesAvailable', Immutable.fromJS(files));
           }
           return step;
         });
-      return state.setIn([ pluginId, installRemove, installType ], inheritFilesToCopySteps(newSteps));
-
+      return state.setIn([ pluginId, 'definition', installRemove, installType ], inheritFilesToCopySteps(newSteps));
     }
 
     case PLUGIN_SAVED: {
@@ -74,7 +82,7 @@ function inheritFilesToCopySteps(steps) {
     }
 
     if (step.get('type') === 'copy') {
-      step = step.set('inheritedFiles', currentFiles)
+      step = step.set('inheritedFiles', highlightInheritedFiles(patternToRegex(step.get('from')), currentFiles));
     }
     return step;
   });
@@ -82,20 +90,36 @@ function inheritFilesToCopySteps(steps) {
 
 function mergeFiles(current, newFiles) {
   const newFilesMap = newFiles.reduce((filesMap, item) => {
-    filesMap[item.name] = item;
+    filesMap[item.get('name')] = item;
     return filesMap;
   }, {});
 
-  const resultingFileList = [].concat(newFiles);
-  const currentInherited = current;
-  currentInherited.forEach(file => {
-    if (!newFilesMap[file.name]) {
-      resultingFileList.push(file);
-    }
+  const resultingFileList = newFiles.withMutations(resultingFileList => {
+    current.forEach(file => {
+      if (!newFilesMap[file.get('name')]) {
+        resultingFileList.push(file);
+      }
+    });
   });
-  return resultingFileList.sort((a, b) => {
-    if (a.name < b.name) return -1;
-    if (a.name > b.name) return 1;
+
+  return Immutable.List(resultingFileList.sort((a, b) => {
+    const aName = a.get('name');
+    const bName = b.get('name');
+    if (aName < bName) return -1;
+    if (aName > bName) return 1;
     return 0;
+  }));
+}
+
+function patternToRegex(pattern) {
+  if (!pattern) {
+    return /^$/;
+  }
+  return minimatch.makeRe(pattern, { nocase: true, nocomment: true, noext: true, noglobstar: true, nonegate: true });
+}
+
+function highlightInheritedFiles(pattern, inheritedFiles) {
+  return inheritedFiles.map(file => {
+    return file.set('highlighted', pattern.test(file.get('name')));
   });
 }

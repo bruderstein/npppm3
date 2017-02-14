@@ -76,14 +76,14 @@ describe('CopyStep', function () {
 
     const step = Immutable.fromJS({
       type: 'copy',
-      filesInherited: [ { name: 'foo.dll' }, { name: 'bar/foo.dll' } ]
+      inheritedFiles: [ { name: 'foo.dll' }, { name: 'bar/foo.dll' } ]
     });
 
     renderer.render(<CopyStep step={step} />);
     expect(renderer, 'to contain',
       <ul>
-        <File file={step.getIn(['filesInherited', 0])} />
-        <File file={step.getIn(['filesInherited', 1])} />
+        <File {...step.getIn(['inheritedFiles', 0]).toJS()} />
+        <File {...step.getIn(['inheritedFiles', 1]).toJS()} />
       </ul>);
   });
 

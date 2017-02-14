@@ -53,7 +53,7 @@ export default class CopyStep extends Component {
 
     const { from, isDirectory, validate, backup } = this.props.step.toJS();
     const { toVariable, toPath } = this.state;
-    const filesInherited = this.props.step.get('filesInherited') || Immutable.List()
+    const inheritedFiles = this.props.step.get('inheritedFiles') || Immutable.List();
 
     return (
       <fieldset className={styles.copyStep} id={this.uniqueId}>
@@ -68,7 +68,7 @@ export default class CopyStep extends Component {
         </Row>
         <FullRow>
           <ul className={styles.filesList}>
-            {filesInherited.map(file => <File file={file} />)}
+            {inheritedFiles.map(file => <File {...file.toJS()} />)}
           </ul>
         </FullRow>
         <Row>
