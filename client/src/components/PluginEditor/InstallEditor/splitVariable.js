@@ -2,6 +2,7 @@
 export default function splitVariable(path) {
   let variableName = '$PLUGINDIR$';
   let restPath = path || '';
+  path = path || '';
   [ '$PLUGINDIR$', '$NPPDIR$', '$PLUGINCONFIGDIR$' ].forEach(candidate => {
     if (path.substr(0, candidate.length) === candidate) {
       variableName = candidate;
