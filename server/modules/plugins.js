@@ -92,6 +92,8 @@ const register = module.exports = function register(server, options, next) {
           payload: {
             _rev: joi.string().required(),
             definition: pluginSchema,
+            pluginId: joi.string().allow(null, ''),  // optional, and it's ignored, but allows the client
+                                                     // to send the same thing they get from the GET request
             hashes: HASHES_SCHEMA
           }
         },

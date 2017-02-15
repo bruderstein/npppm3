@@ -160,7 +160,7 @@ describe('pluginsById', function () {
               unicode: [
                 {
                   type: 'download',
-                  filesAvailable: [
+                  $filesAvailable: [
                     { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '11112222333344445555666677778888' }
                   ]
@@ -199,7 +199,7 @@ describe('pluginsById', function () {
                 },
                 {
                   type: 'copy',
-                  inheritedFiles: [
+                  $inheritedFiles: [
                     { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '11112222333344445555666677778888' }
                   ]
@@ -232,7 +232,7 @@ describe('pluginsById', function () {
         install: {
           unicode: [
             { type: 'download' },
-            { type: 'copy', from: '*.dll', inheritedFiles: [
+            { type: 'copy', from: '*.dll', $inheritedFiles: [
               { name: 'plugin.dll', highlighted: true },
               { name: 'readme.txt', highlighted: expect.it('to be falsy') }
             ]
@@ -305,17 +305,17 @@ describe('pluginsById', function () {
           definition: {
             install: {
               unicode: [
-                { type: 'download', filesAvailable: undefined },
-                { type: 'copy', inheritedFiles: [] },
+                { type: 'download', $filesAvailable: undefined },
+                { type: 'copy', $inheritedFiles: [] },
                 {
                   type: 'download',
-                  filesAvailable: [
+                  $filesAvailable: [
                     { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' }
                   ]
                 },
                 {
                   type: 'copy',
-                  inheritedFiles: [
+                  $inheritedFiles: [
                     { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' }
                   ]
                 }
@@ -366,28 +366,28 @@ describe('pluginsById', function () {
               unicode: [
                 {
                   type: 'download',
-                  filesAvailable: [
+                  $filesAvailable: [
                     { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '11112222333344445555666677778888' },
                   ]
                 },
                 {
                   type: 'copy',
-                  inheritedFiles: [
+                  $inheritedFiles: [
                     { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '11112222333344445555666677778888' },
                   ]
                 },
                 {
                   type: 'download',
-                  filesAvailable: [
+                  $filesAvailable: [
                     { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '88887777666655554444333322221111' },
                   ]
                 },
                 {
                   type: 'copy',
-                  inheritedFiles: [
+                  $inheritedFiles: [
                     { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '88887777666655554444333322221111' } // readme.txt from plugin-addons.zip
@@ -435,14 +435,14 @@ describe('pluginsById', function () {
               unicode: [
                 {
                   type: 'download',
-                  filesAvailable: [
+                  $filesAvailable: [
                     { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '11112222333344445555666677778888' }
                   ]
                 },
                 {
                   type: 'copy',
-                  inheritedFiles: [
+                  $inheritedFiles: [
                     { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '11112222333344445555666677778888' }
                   ]
@@ -452,14 +452,14 @@ describe('pluginsById', function () {
                 },
                 {
                   type: 'copy',
-                  inheritedFiles: [
+                  $inheritedFiles: [
                     { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '11112222333344445555666677778888' }
                   ]
                 },
                 {
                   type: 'copy',
-                  inheritedFiles: [
+                  $inheritedFiles: [
                     { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
                     { name: 'readme.txt', md5: '11112222333344445555666677778888' }
                   ]
@@ -525,7 +525,7 @@ describe('pluginsById', function () {
         install: {
           unicode: [
             { type: 'download' },
-            { type: 'copy', from: '*.dll', inheritedFiles: [
+            { type: 'copy', from: '*.dll', $inheritedFiles: [
               { name: 'plugin.dll', highlighted: true },
               { name: 'plugin2.dll', highlighted: true },
               { name: 'readme.txt', highlighted: expect.it('to be falsy') }

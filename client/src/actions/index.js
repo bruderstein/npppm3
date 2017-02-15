@@ -98,9 +98,7 @@ const saveNewPlugin = function (plugin) {
 
   return fetch('/api/plugins', {
     method: 'POST',
-    body: {
-      definition: plugin.toJS()
-    }
+    body: stripExtraFields(plugin.toJS())
   }).then(response => {
     return {
       type: PLUGIN_SAVED,
@@ -113,15 +111,26 @@ const savePlugin = function (pluginId, plugin) {
 
   return fetch('/api/plugins/' + pluginId, {
     method: 'PUT',
-    body: {
-      definition: plugin.toJS()
-    }
+    body: stripExtraFields(plugin.toJS())
   }).then(response => {
     return {
       type: PLUGIN_SAVED,
       payload: { response }
     };
   });
+};
+
+const stripExtraFields = function (item) {
+  if (item && typeof item === 'object') {
+    Object.keys(item).forEach(key => {
+      if (key && key[0] === '$') {
+        delete item[key];
+      } else {
+        stripExtraFields(item[key]);
+      }
+    });
+  }
+  return item;
 };
 
 const fetchFileList = function ({ pluginId, installRemove, installType, url }) {

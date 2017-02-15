@@ -53,7 +53,7 @@ export default class CopyStep extends Component {
 
     const { from, isDirectory, validate, backup } = this.props.step.toJS();
     const { toVariable, toPath } = this.state;
-    const inheritedFiles = this.props.step.get('inheritedFiles') || Immutable.List();
+    const inheritedFiles = this.props.step.get('$inheritedFiles') || Immutable.List();
 
     return (
       <fieldset className={styles.copyStep} id={this.uniqueId}>

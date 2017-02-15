@@ -38,7 +38,7 @@ class DownloadStep extends Component {
 
     const { url } = this.state;
     const { step } = this.props;
-    const filesAvailable = step.get('filesAvailable') || [];
+    const filesAvailable = step.get('$filesAvailable') || [];
     return (
       <fieldset className={styles.downloadStep} id={this.uniqueId}>
         <label htmlFor={this.uniqueId}>Download</label>

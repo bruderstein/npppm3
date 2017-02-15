@@ -10,7 +10,6 @@ const stepSchema = joi.alternatives().try(
   joi.object({
     type: joi.string().required().valid('copy'),
     from: joi.string().required(),
-    toPrefix: joi.string().required(),
     to: joi.string().required().allow('')
   }),
   joi.object({
@@ -43,7 +42,7 @@ const pluginSchema = {
   })),
   unicodeVersion: VERSION_VALIDATION.allow(''),
   x64Version: VERSION_VALIDATION.allow(''),
-  install: joi.array().items({
+  install: joi.object({
     unicode: joi.array().items(stepSchema),
     x64: joi.array().items(stepSchema),
     ansi: joi.array().items(stepSchema)
