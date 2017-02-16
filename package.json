@@ -28,6 +28,7 @@
     "bell": "^8.4.0",
     "bluebird": "^3.4.6",
     "config": "^1.24.0",
+    "font-awesome": "^4.7.0",
     "glue": "^4.0.0",
     "hapi": "latest",
     "hapi-auth-jwt2": "^7.2.4",
@@ -39,6 +40,8 @@
     "ms": "^0.7.2",
     "nano": "^6.2.0",
     "node-fetch": "^1.6.3",
+    "react-select": "^1.0.0-rc.3",
+    "react-tooltip": "^3.2.6",
     "uuid": "^3.0.0",
     "xml-js-converter": "^1.0.0"
   }
