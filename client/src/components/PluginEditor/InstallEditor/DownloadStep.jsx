@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { fetchFileList } from '../../../actions';
+import { fetchFileList } from '../../../data/pluginsById';
 
 import File from './File';
 import { FullRow, Row, Cell } from '../../Grid';

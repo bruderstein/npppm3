@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { login } from '../../actions';
+import { login } from '../../data/auth';
 import styles from '../../styles.css';
 
 import { FullRow, Row, Cell } from '../Grid';

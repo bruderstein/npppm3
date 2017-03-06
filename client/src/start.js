@@ -2,7 +2,7 @@ import App from './components/App/App';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 import { AppContainer } from 'react-hot-loader';
 // TODO: Submit this update as a PR (
 import RedboxReact from '@bruderstein/redbox-react'

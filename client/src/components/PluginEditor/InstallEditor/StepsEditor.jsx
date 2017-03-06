@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import AddStepButton from './AddStepButton';
 import { connect } from 'react-redux';
-import { installStepChange, installStepAdd } from '../../../actions';
+import { installStepChange, installStepAdd } from '../../../data/pluginsById';
 
 import styles from './steps-editor.css';
 

@@ -1,56 +1,42 @@
-import React, { Component } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import { Match, Miss, Redirect } from 'react-router';
-import { fetchPluginList } from '../../actions'
-import styles from '../../styles.css';
-
-import PluginList from '../PluginList/PluginList';
-import EditPlugin from '../PluginEditor/EditPlugin';
-import NewPlugin from '../PluginEditor/NewPlugin';
+import AuthenticatedApp from './AuthenticatedApp';
+import { FullRow } from '../Grid';
+import Header from '../Header/Header';
 import Login from '../Login/Login';
-import Row from '../Grid/Row';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { authSelector, checkAuthenticated } from '../../data/auth';
+
+import styles from '../../styles.css';
 
 class App extends Component {
   constructor(props) {
     super(props);
-    props.fetchPluginList();
+    props.checkAuthenticated();
   }
-  
+
   render() {
+    const { isAuthenticated } = this.props;
     return (
-      <Row>
-        <Match pattern="/plugins" exactly component={PluginList} />
-        <Match pattern="/login" exactly component={Login} />
-        <Match pattern="/plugins/:id" render={props => {
-          if (props.params.id === 'new') {
-            return <NewPlugin />;
-          }
-          return <EditPlugin {...props} />;
-        }} />
-        <Miss component={NoMatch} />
-      </Row>
+      <div className={styles.application}>
+        <Header />
+        <FullRow>
+          { isAuthenticated ? <AuthenticatedApp /> : <Login />}
+        </FullRow>
+      </div>
     );
   }
 }
 
-function NoMatch() {
-  return (
-    <div>
-      <span>Nothing matched!</span>
-    </div>
-  );
-}
 
 function mapDispatchToProps(dispatch) {
   return {
-    fetchPluginList: () => dispatch(fetchPluginList())
+    checkAuthenticated: () => dispatch(checkAuthenticated())
   };
 }
 
 function mapStateToProps(state) {
-  return { pluginsLoaded: state.pluginsLoaded };
+  return { isAuthenticated: authSelector(state).authenticated };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps, null, { pure: false })(App);
 

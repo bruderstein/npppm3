@@ -20,8 +20,8 @@ export default class Step extends Component {
   }
 
   static propTypes = {
-    stepNumber: PropTypes.number.required,
-    step: PropTypes.instanceOf(Immutable.Map).required
+    stepNumber: PropTypes.number.isRequired,
+    step: PropTypes.instanceOf(Immutable.Map).isRequired
   };
 
   onFieldChange(fieldName, value) {

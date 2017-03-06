@@ -1,7 +1,7 @@
 
-import pluginsById from '../pluginsById';
+import { pluginsByIdReducer as pluginsById } from '../pluginsById';
 import Immutable from 'immutable';
-import { PLUGIN_CREATED, PLUGIN_FIELD_CHANGED, INSTALL_STEP_ADD, PLUGIN_FETCHED, FILE_LIST_FETCHED } from '../../actions';
+import { PLUGIN_CREATED, PLUGIN_FIELD_CHANGED, INSTALL_STEP_ADD, PLUGIN_FETCHED, FILE_LIST_FETCHED } from '../pluginsById';
 
 import unexpected from 'unexpected';
 

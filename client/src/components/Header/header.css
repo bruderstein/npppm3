@@ -1,0 +1,13 @@
+.header {
+  background: linear-gradient(0deg, rgb(197, 120, 40) 0, rgb(209, 155, 49) 10px, rgb(57, 68, 74) 10px, rgb(57, 68, 74) 45px);
+  font-size: 1em;
+  height: 45px;
+  margin-bottom: 15px;
+  padding-top: 1px;
+  color: #eeeeee;
+}
+
+.header h1 {
+  font-size: 1em;
+  padding-left: 10px;
+}

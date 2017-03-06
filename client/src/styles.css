@@ -429,3 +429,7 @@ button {
 button:hover  {
   background: #eee;
 }
+
+.application {
+  width: 100%;
+}

@@ -1,15 +1,22 @@
+import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import styles from './plugin-list.css';
-
-import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
+import { fetchPluginList, pluginListSelector } from '../../data/pluginList';
 import PluginListEntry from '../PluginListEntry/PluginListEntry';
 
+import styles from './plugin-list.css';
+
+
 class PluginList extends Component {
+
+  constructor(props) {
+    super(props);
+    props.fetchPluginList();
+  }
   
   render() {
-    const { plugins, loaded } = this.props;
-    if (!loaded) {
+    const { plugins } = this.props;
+    if (!plugins) {
       return <LoadingIndicator />;
     }
     
@@ -27,9 +34,14 @@ class PluginList extends Component {
 
 function mapStateToProps(state) {
   return {
-    plugins: state.pluginList,
-    loaded: state.pluginsLoaded
+    plugins: pluginListSelector(state)
   };
 }
 
-export default connect(mapStateToProps)(PluginList)
+function mapDispatchToProps(dispatch) {
+  return {
+    fetchPluginList: () => dispatch(fetchPluginList())
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PluginList)

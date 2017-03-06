@@ -3,9 +3,16 @@ import 'isomorphic-fetch';
 export function fetchJson(url, options) {
   return standardFetch(url, options)
     .then((response) => {
-      return response.json();
-    }).then(json => {
-      return json;
+      if (response.status >= 200 && response.status < 300) {
+        return response.json()
+          .then(json => {
+            return {
+              status: response.status,
+              payload: json
+            }
+          });
+      }
+      return { status: response.status };
     });
 }
 

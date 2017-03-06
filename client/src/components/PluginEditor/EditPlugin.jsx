@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import styles from './plugin-editor.css';
 
-import { savePlugin, fetchPlugin, fieldChanged } from '../../actions'
+import { pluginById, savePlugin, fetchPlugin, fieldChanged } from '../../data/pluginsById'
 
 import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
 import PluginEditor from './PluginEditor';
@@ -42,15 +42,15 @@ class EditPlugin extends Component {
 
 function mapStateToProps(state, ownProps) {
   return {
-    plugin: state && state.pluginsById && state.pluginsById.get(ownProps.params.id)
+    plugin: pluginById(state, ownProps.match.params.id)
   };
 }
 
 function mapDispatchToProps(dispatch, ownProps) {
   return {
-    fetchPlugin: () => dispatch(fetchPlugin(ownProps.params.id)),
-    onFieldChange: (field, value) => dispatch(fieldChanged(ownProps.params.id, field, value)),
-    onSave: (plugin) => dispatch(savePlugin(ownProps.params.id, plugin))
+    fetchPlugin: () => dispatch(fetchPlugin(ownProps.match.params.id)),
+    onFieldChange: (field, value) => dispatch(fieldChanged(ownProps.match.params.id, field, value)),
+    onSave: (plugin) => dispatch(savePlugin(ownProps.match.params.id, plugin))
   }
 }
 
