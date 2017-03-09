@@ -619,7 +619,6 @@ describe('auth module', function () {
         method: 'GET',
         url: '/api/auth/github'
       }).then(response => {
-        console.log('Response is', response.headers);
         // TODO: Use proper cookie parsing library (literally on a plane, am offline just like they talk about)
         const tokenHeader = response.headers['set-cookie'].find(header => /^token=/.test(header));
         const refreshHeader = response.headers['set-cookie'].find(header => /^refresh=/.test(header));
