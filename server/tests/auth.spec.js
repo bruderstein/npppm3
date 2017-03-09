@@ -309,6 +309,23 @@ describe('auth module', function () {
       });
     });
 
+    it('returns the user email and displayName when the password is valid', function () {
+
+      return inject({
+        method: 'POST',
+        url: '/api/auth/signin',
+        payload: {
+          email: 'test@foo.com',
+          password: 'bigS3cret'
+        }
+      }).then(response => {
+        expect(response.body, 'to satisfy', {
+          email: 'test@foo.com',
+          displayName: 'Mrs Foo'
+        });
+      });
+    });
+
     it('returns unauthorized when the authType for the user is not `password`', function () {
       mockDb.getAsync.withArgs('test@foo.com-email').returns(Promise.resolve({
         authType: 'github',
@@ -504,8 +521,8 @@ describe('auth module', function () {
 
             mockDb.insertAsync({
               type: 'refresh-token'
-            })
-          })
+            });
+          });
         });
       });
 
@@ -535,52 +552,52 @@ describe('auth module', function () {
 
   describe('with a user with a bcrypt password', function () {
 
-      beforeEach(() => {
+    beforeEach(() => {
 
-        mockDb.getAsync.withArgs('test@foo.com-email').returns(Promise.resolve({
-          _id: 'test@foo.com-email',
-          _rev: '3-111222',
-          userId: 'test1234',
-          authType: 'password',
-          algorithm: 'bcrypt',
-          password: BIG_S3CRET_BCRYPT
-        }));
+      mockDb.getAsync.withArgs('test@foo.com-email').returns(Promise.resolve({
+        _id: 'test@foo.com-email',
+        _rev: '3-111222',
+        userId: 'test1234',
+        authType: 'password',
+        algorithm: 'bcrypt',
+        password: BIG_S3CRET_BCRYPT
+      }));
 
-        mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
-          scope: ['login'],
-          displayName: 'anna'
-        }));
+      mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
+        scope: ['login'],
+        displayName: 'anna'
+      }));
 
-        mockDb.insertAsync.returns(Promise.resolve({}));
+      mockDb.insertAsync.returns(Promise.resolve({}));
+    });
+
+    it('authorises the user when the password is valid', function () {
+
+      return inject({
+        method: 'POST',
+        url: '/api/auth/signin',
+        payload: {
+          email: 'test@foo.com',
+          password: 'bigS3cret'
+        }
+      }).then(response => {
+        expect(response, 'to contain the authorization headers');
       });
+    });
 
-      it('authorises the user when the password is valid', function () {
+    it('does not authorise the user when the password is invalid', function () {
 
-        return inject({
-          method: 'POST',
-          url: '/api/auth/signin',
-          payload: {
-            email: 'test@foo.com',
-            password: 'bigS3cret'
-          }
-        }).then(response => {
-          expect(response, 'to contain the authorization headers');
-        });
+      return inject({
+        method: 'POST',
+        url: '/api/auth/signin',
+        payload: {
+          email: 'test@foo.com',
+          password: 'wrong'
+        }
+      }).then(response => {
+        expect(response, 'not to contain the authorization headers');
       });
-
-      it('does not authorise the user when the password is invalid', function () {
-
-        return inject({
-          method: 'POST',
-          url: '/api/auth/signin',
-          payload: {
-            email: 'test@foo.com',
-            password: 'wrong'
-          }
-        }).then(response => {
-          expect(response, 'not to contain the authorization headers');
-        });
-      });
+    });
   });
 
   describe('jwt authentication', function () {
@@ -602,6 +619,7 @@ describe('auth module', function () {
         method: 'GET',
         url: '/api/auth/github'
       }).then(response => {
+        console.log('Response is', response.headers);
         // TODO: Use proper cookie parsing library (literally on a plane, am offline just like they talk about)
         const tokenHeader = response.headers['set-cookie'].find(header => /^token=/.test(header));
         const refreshHeader = response.headers['set-cookie'].find(header => /^refresh=/.test(header));
@@ -794,19 +812,19 @@ describe('auth module', function () {
 
     it('returns a success response', function () {
 
-        mockDb.insertAsync.returns(Promise.resolve({}));
+      mockDb.insertAsync.returns(Promise.resolve({}));
 
-        return inject({
-          method: 'POST',
-          url: '/api/auth/signup',
-          payload: {
-            email: 'test@foo.com',
-            password: 'bigS3cret',
-            displayName: 'Mrs Unit Test'
-          }
-        }).then(response => {
-          expect(response.result, 'to equal', { success: true });
-        });
+      return inject({
+        method: 'POST',
+        url: '/api/auth/signup',
+        payload: {
+          email: 'test@foo.com',
+          password: 'bigS3cret',
+          displayName: 'Mrs Unit Test'
+        }
+      }).then(response => {
+        expect(response.result, 'to equal', { success: true });
+      });
     });
 
     describe('when signing up with an existing user', function () {
@@ -899,7 +917,7 @@ describe('auth module', function () {
       return inject({
         method: 'POST',
         url: '/api/auth/approve?email=test@foo.com',
-        credentials: { displayName: 'normalUser', scope: ['login']}
+        credentials: { displayName: 'normalUser', scope: ['login'] }
       }).then(response => {
         expect(response.statusCode, 'to equal', 403);
       });

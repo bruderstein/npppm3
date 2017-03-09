@@ -7,12 +7,14 @@
     "stop-db": "docker rm -f npppm-couchdb",
     "clean-db": "rm -rf ./couchdb-data",
     "stop-clean-db": "npm run stop-db & npm run clean-db",
+    "lint": "eslint .",
     "test": "mocha \"server/**/tests/*.spec.js\""
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
     "couchapp": "^0.11.0",
     "eslint": "^3.12.2",
+    "eslint-plugin-react": "^6.10.0",
     "mocha": "^3.1.2",
     "request": "^2.79.0",
     "request-promise": "^4.1.1",

@@ -3,6 +3,7 @@ import { registerReducer } from '../store';
 import { AUTHENTICATION_REQUIRED } from './auth';
 
 const PLUGIN_LIST_FETCHED = 'npppm/pluginList/PLUGIN_LIST_FETCHED';
+const FETCH_ERROR = 'npppm/pluginList/FETCH_ERROR';
 
 // Actions
 export const fetchPluginList = function () {

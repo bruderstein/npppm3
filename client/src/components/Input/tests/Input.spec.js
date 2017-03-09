@@ -1,6 +1,6 @@
 
 import unexpectedReact from 'unexpected-react';
-import unexpected from 'unexpected'
+import unexpected from 'unexpected';
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 

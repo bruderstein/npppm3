@@ -3,7 +3,7 @@ import reducer from '../reducers';
 import reduxPromise from 'redux-promise';
 
 
-export default function configureStore(initialState) {
+export default function configureStore() {
   
   const middlewares = [reduxPromise];
   

@@ -49,7 +49,7 @@ describe('DeleteStep', function () {
     });
 
     renderer.render(<DeleteStep step={step} />);
-    expect(renderer, 'to contain', <select defaultValue="$NPPDIR$" />)
+    expect(renderer, 'to contain', <select defaultValue="$NPPDIR$" />);
   });
 
   it('sets the variable to the default if no known variable is found', function () {

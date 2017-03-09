@@ -194,7 +194,7 @@ const register = module.exports = function register(server, options, next) {
                   // Could actually add a separate plugin for random delays for 401 response times
                   return reply(e);
                 }
-                reply(boom.internal())
+                reply(boom.internal());
               });
           }
         }
@@ -364,7 +364,7 @@ const getEmailDoc = function (db, email) {
 
 const getUserDoc = function (db, emailDoc) {
   return db.getAsync(emailDoc.userId)
-    .then(userDoc => ({ emailDoc, userDoc }))
+    .then(userDoc => ({ emailDoc, userDoc }));
 };
 
 const authorizeScope = function (emailDoc, userDoc) {
@@ -381,7 +381,7 @@ const authenticateWithPassword = function (db, emailDoc, email, password) {
   }
 
   return validateCredentials(emailDoc, password)
-    .catch(e => {
+    .catch(() => {
       emailDoc.failedLogins = (emailDoc.failedLogins || 0) + 1;
       if (emailDoc.accountLocked) {
         delete emailDoc.accountLocked;
@@ -401,7 +401,7 @@ const authenticateWithPassword = function (db, emailDoc, email, password) {
         return db.insertAsync(emailDoc);
       }
     })
-    .then(() => emailDoc)
+    .then(() => emailDoc);
 };
 
 const validateCredentials = function (emailDoc, password) {
@@ -477,45 +477,45 @@ const createUser = function (db, userOptions) {
 
 function createAuthTokens(db, { userId, displayName, scope }) {
 
-        const jwtConfig = config.get('auth.jwt');
-        return new Promise((resolve, reject) => {
-          jwt.sign({ displayName, scope }, jwtConfig.secret, {
-            issuer: jwtConfig.issuer,
-            subject: userId,
-            expiresIn: jwtConfig.accessExpiresIn
-          }, (err, token) => {
+  const jwtConfig = config.get('auth.jwt');
+  return new Promise((resolve, reject) => {
+    jwt.sign({ displayName, scope }, jwtConfig.secret, {
+      issuer: jwtConfig.issuer,
+      subject: userId,
+      expiresIn: jwtConfig.accessExpiresIn
+    }, (err, token) => {
 
-            if (err) {
-              return reject(err);
-            }
-            return resolve(token);
-          });
-        }).then(token => {
-          return new Promise((resolve, reject) => {
-            crypto.randomBytes(64, (err, buf) => {
-              if (err) {
-                return reject(err);
-              }
-              resolve(buf);
-            });
-          }).then(buf => {
-            return { token, bytes: buf };
-          });
-        }).then(tokens => {
-          const refreshToken = tokens.bytes.toString('hex');
-          return db.insertAsync({
-            _id: hashRefreshToken(refreshToken) + '-refresh',
-            type: 'refresh-token',
-            userId,
-            displayName,
-            scope: scope,
-            created: Date.now() / 1000  // `created` should be treated like `exp` in the JWT, i.e.
-                                        // i.e. use seconds-since-epoch, not milliseconds-since-epoch
-          }).then(() => {
-            return { accessToken: tokens.token, refreshToken };
-          });
-        });
+      if (err) {
+        return reject(err);
       }
+      return resolve(token);
+    });
+  }).then(token => {
+    return new Promise((resolve, reject) => {
+      crypto.randomBytes(64, (err, buf) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(buf);
+      });
+    }).then(buf => {
+      return { token, bytes: buf };
+    });
+  }).then(tokens => {
+    const refreshToken = tokens.bytes.toString('hex');
+    return db.insertAsync({
+      _id: hashRefreshToken(refreshToken) + '-refresh',
+      type: 'refresh-token',
+      userId,
+      displayName,
+      scope: scope,
+      created: Date.now() / 1000  // `created` should be treated like `exp` in the JWT, i.e.
+                                        // i.e. use seconds-since-epoch, not milliseconds-since-epoch
+    }).then(() => {
+      return { accessToken: tokens.token, refreshToken };
+    });
+  });
+}
 
 const createResponse = function (reply, { accessToken, refreshToken }) {
   if (accessToken) {
@@ -544,6 +544,6 @@ const acceptOnlyAuthTypes = function (emailDoc, authTypes) {
     return emailDoc;
   }
   throw boom.unauthorized();
-}
+};
 
 

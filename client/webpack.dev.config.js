@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack');
 const config = require('./webpack.config');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -20,7 +19,7 @@ config.devServer = {
 };
 config.module.loaders.forEach(loader => {
   if (loader.test.toString() === '/\\.css$/') {
-    loader.loader = ExtractTextPlugin.extract('style-loader', 'css-loader?modules&importLoaders=1&localIdentName=[name]---[local]---[hash:base64:5]!postcss-loader')
+    loader.loader = ExtractTextPlugin.extract('style-loader', 'css-loader?modules&importLoaders=1&localIdentName=[name]---[local]---[hash:base64:5]!postcss-loader');
   }
 });
 config.plugins = config.plugins || [];

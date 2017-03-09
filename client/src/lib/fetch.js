@@ -9,7 +9,7 @@ export function fetchJson(url, options) {
             return {
               status: response.status,
               payload: json
-            }
+            };
           });
       }
       return { status: response.status };

@@ -11,9 +11,9 @@ export default function withFieldWrapper(WrappedComponent) {
 
 
     static propTypes = {
-      labelSize: PropTypes.number,
+      docs: PropTypes.string,
       label: PropTypes.string.isRequired,
-      docs: PropTypes.string
+      labelSize: PropTypes.number
     };
 
     constructor(props) {
@@ -22,11 +22,11 @@ export default function withFieldWrapper(WrappedComponent) {
     }
 
     render() {
-      const { label, labelSize, docs, children, ...restProps } = this.props;
+      const { label, labelSize, docs, ...restProps } = this.props;
 
       return (
         <Row>
-          <Cell large={labelSize || "2"} small="12">
+          <Cell large={labelSize || '2'} small="12">
             <label htmlFor={'field-wrapper-' + this.uniqueId}>{label}</label>
           </Cell>
           <Cell large={(labelSize && (12-labelSize)) || 10} small="12">

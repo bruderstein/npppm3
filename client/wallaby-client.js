@@ -13,19 +13,19 @@ module.exports = function (wallaby) {
     compilers: {
       'src/**/*.js': wallaby.compilers.babel({
         babel: babel,
-        "presets": ["es2015", "react"],
-        "plugins": ["transform-object-rest-spread", "transform-class-properties"]
+        'presets': ['es2015', 'react'],
+        'plugins': ['transform-object-rest-spread', 'transform-class-properties']
       }),
       'src/**/*.jsx': wallaby.compilers.babel({
         babel: babel,
-        "presets": ["es2015", "react"],
-        "plugins": ["transform-object-rest-spread", "transform-class-properties"]
+        'presets': ['es2015', 'react'],
+        'plugins': ['transform-object-rest-spread', 'transform-class-properties']
       })
     },
     setup() {
       require.extensions['.jsx'] = require.extensions['.js'];
-      wallaby.testFramework.configure(require('./package.json').jest)
+      wallaby.testFramework.configure(require('./package.json').jest);
     },
     testFramework: 'jest'
-  }
+  };
 };

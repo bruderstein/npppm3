@@ -37,7 +37,7 @@ export const fieldChanged = function (pluginId, field, value) {
   };
 };
 
-export const installStepChange = function ({ pluginId, installRemove, installType, stepNumber, field, value}) {
+export const installStepChange = function ({ pluginId, installRemove, installType, stepNumber, field, value }) {
   return {
     type: INSTALL_STEP_FIELD_CHANGED,
     payload: {
@@ -154,12 +154,12 @@ function pluginsById(state = Immutable.Map(), action) {
 
       state = state
         .updateIn([pluginId, 'definition', installRemove, installType, stepNumber], (step) => {
-        if (step.get('type') === 'copy' && field === 'from' && step.get('$inheritedFiles')) {
-          const pattern = patternToRegex(value);
-          step = step.update('$inheritedFiles', (files) => highlightInheritedFiles(pattern, files));
-        }
-        return step.set(field, value)
-      });
+          if (step.get('type') === 'copy' && field === 'from' && step.get('$inheritedFiles')) {
+            const pattern = patternToRegex(value);
+            step = step.update('$inheritedFiles', (files) => highlightInheritedFiles(pattern, files));
+          }
+          return step.set(field, value);
+        });
 
       return state;
     }
@@ -217,7 +217,7 @@ function inheritFilesToCopySteps(steps) {
   let currentFiles = Immutable.List();
   return steps.map(step => {
     if (step.get('type') === 'download' && step.get('$filesAvailable')) {
-      currentFiles = mergeFiles(currentFiles, step.get('$filesAvailable'))
+      currentFiles = mergeFiles(currentFiles, step.get('$filesAvailable'));
     }
 
     if (step.get('type') === 'copy') {

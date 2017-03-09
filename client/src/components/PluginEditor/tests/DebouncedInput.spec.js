@@ -21,7 +21,7 @@ describe('DebouncedInput', function () {
   let timers;
   beforeEach(function () {
     renderer = TestUtils.createRenderer();
-    timers = Sinon.useFakeTimers()
+    timers = Sinon.useFakeTimers();
   });
 
   afterEach(function () {
@@ -65,7 +65,7 @@ describe('DebouncedInput', function () {
     ReactDOM.render(<DebouncedInput defaultValue="bar" onChange={onChange} />, div);
 
     return expect(component, 'queried for', <input />).then(input => {
-      expect(input.value, 'to equal', 'foo')
+      expect(input.value, 'to equal', 'foo');
     });
 
   });

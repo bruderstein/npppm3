@@ -1,5 +1,5 @@
 
-module.exports = function (wallaby) {
+module.exports = function () {
   
   return {
     files: ['server/**/*.js', '!server/**/tests/*.spec.js', 'config/**/*.json', {
@@ -12,5 +12,5 @@ module.exports = function (wallaby) {
       type: 'node',
       runner: 'node'
     }
-  }
+  };
 };

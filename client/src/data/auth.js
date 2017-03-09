@@ -44,7 +44,7 @@ export const checkAuthenticated = function checkAuthenticated() {
         return {
           type: LOGGED_IN,
           payload: response.payload
-        }
+        };
       }
       if (response.status === 401) {
         return {

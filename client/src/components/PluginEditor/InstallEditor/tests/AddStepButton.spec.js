@@ -21,7 +21,7 @@ describe('AddStepButton', function () {
   });
 
   it('renders the button', function () {
-    renderer.render(<AddStepButton icon="fa-add" />)
+    renderer.render(<AddStepButton icon="fa-add" />);
     expect(renderer, 'to have rendered',
       <button><i className="fa-add" /></button>
     );
@@ -29,10 +29,10 @@ describe('AddStepButton', function () {
 
   it('calls onAddStep with the type', function () {
     const spy = sinon.spy();
-    renderer.render(<AddStepButton icon="fa-add" type="add" onAddStep={spy} />)
+    renderer.render(<AddStepButton icon="fa-add" type="add" onAddStep={spy} />);
     return expect(renderer, 'with event', 'click')
       .then(() => {
-        expect(spy, 'to have calls satisfying', [ [ 'add' ]])
+        expect(spy, 'to have calls satisfying', [ [ 'add' ]]);
       });
   });
 

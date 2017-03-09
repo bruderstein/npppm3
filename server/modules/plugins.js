@@ -59,7 +59,7 @@ const register = module.exports = function register(server, options, next) {
         handler: function (request, reply) {
           const pluginId = uuid();
           const editId = uuid();
-          const resultPromise = server.app.db.insertAsync({type: recordTypes.CURRENT,
+          const resultPromise = server.app.db.insertAsync({ type: recordTypes.CURRENT,
             _id: pluginId,
             editId,
             definition: request.payload.definition,

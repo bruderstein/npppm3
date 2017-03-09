@@ -1,19 +1,15 @@
 
 import unexpectedReact from 'unexpected-react';
-import unexpectedSinon from 'unexpected-sinon';
 import unexpected from 'unexpected';
 
-import Sinon from 'sinon';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 
 import Cell from '../Cell';
 
 const expect = unexpected
   .clone()
-  .use(unexpectedReact)
-  .use(unexpectedSinon);
+  .use(unexpectedReact);
 
 describe('Cell', function () {
 

@@ -5,9 +5,9 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { AppContainer } from 'react-hot-loader';
 // TODO: Submit this update as a PR (
-import RedboxReact from '@bruderstein/redbox-react'
+import RedboxReact from '@bruderstein/redbox-react';
 
-import styles from './styles.css';
+import './styles.css';
 
 import store from './store';
 

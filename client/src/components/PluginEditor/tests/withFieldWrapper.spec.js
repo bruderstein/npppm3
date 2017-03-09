@@ -3,9 +3,7 @@ import unexpectedReact from 'unexpected-react';
 import unexpectedSinon from 'unexpected-sinon';
 import unexpected from 'unexpected';
 
-import Sinon from 'sinon';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 
 import withFieldWrapper from '../withFieldWrapper';
@@ -16,7 +14,7 @@ const expect = unexpected
   .use(unexpectedSinon);
 
 const SomeComponent = function (props) {
-  return <div {...props}>SomeComponent</div>
+  return <div {...props}>SomeComponent</div>;
 };
 
 const Wrapped = withFieldWrapper(SomeComponent);
@@ -29,13 +27,13 @@ describe('withFieldWrapper', function () {
   });
 
   it('renders the wrapped component', function () {
-    renderer.render(<Wrapped />)
+    renderer.render(<Wrapped />);
     expect(renderer, 'to contain', <SomeComponent />);
   });
 
   it('renders the label with a unique id', function () {
     renderer.render(<Wrapped label="foo" />);
-    expect(renderer, 'to contain', <label htmlFor={ expect.it('to match', /field-wrapper-[0-9]+/)}>foo</label>)
+    expect(renderer, 'to contain', <label htmlFor={ expect.it('to match', /field-wrapper-[0-9]+/)}>foo</label>);
   });
 
   it('does not pass the label on to the wrapped component', function () {

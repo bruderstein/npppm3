@@ -2,7 +2,7 @@
 import unexpectedReact from 'unexpected-react';
 import Immutable from 'immutable';
 import CopyStep from '../CopyStep';
-import File from '../File'
+import File from '../File';
 import React from 'react';
 import sinon from 'sinon';
 import TestUtils from 'react-addons-test-utils';
@@ -59,7 +59,7 @@ describe('CopyStep', function () {
     });
 
     renderer.render(<CopyStep step={step} />);
-    expect(renderer, 'to contain', <select defaultValue="$NPPDIR$" />)
+    expect(renderer, 'to contain', <select defaultValue="$NPPDIR$" />);
   });
 
   it('sets the variable to the default if no known variable is found', function () {
@@ -98,8 +98,8 @@ describe('CopyStep', function () {
     return expect(renderer, 'with event change', { target: { value: 'foobar.dll' } },
       'on', <input value="foo.dll" />)
       .then(() => {
-      expect(spy, 'to have calls satisfying', [ [ 'to', '$PLUGINDIR$foobar.dll'] ]);
-    });
+        expect(spy, 'to have calls satisfying', [ [ 'to', '$PLUGINDIR$foobar.dll'] ]);
+      });
   });
 
   it('calls the onFieldChange callback with the variable when the `to` variable select is changed', function () {
@@ -113,8 +113,8 @@ describe('CopyStep', function () {
     return expect(renderer, 'with event change', { target: { value: '$NPPDIR$' } },
       'on', <select />)
       .then(() => {
-      expect(spy, 'to have calls satisfying', [ [ 'to', '$NPPDIR$foo.dll'] ]);
-    });
+        expect(spy, 'to have calls satisfying', [ [ 'to', '$NPPDIR$foo.dll'] ]);
+      });
   });
 
 });

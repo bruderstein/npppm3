@@ -288,7 +288,7 @@ describe('server - plugins', function () {
         result:  { pluginId: '1234', _rev: '1-abcdef' }
       }).then(() => {
         return expect(mockDb.insertAsync, 'to have calls satisfying', function () {
-          mockDb.insertAsync({ definition: { name: 'test 1' }});
+          mockDb.insertAsync({ definition: { name: 'test 1' } });
           mockDb.insertAsync({ _id: expect.it('to match', UUID_REGEX), type: 'edit-history', pluginId: '1234' });
         });
       }).then(() => {
@@ -350,7 +350,7 @@ describe('server - plugins', function () {
         result:  { pluginId: PLUGIN_ID, _rev: '2-123abc' }
       }).then(() => {
         return expect(mockDb.insertAsync, 'to have calls satisfying', function () {
-          mockDb.insertAsync({ _id: PLUGIN_ID, _rev: '1-abcdef', definition: { name: 'test 1' }});
+          mockDb.insertAsync({ _id: PLUGIN_ID, _rev: '1-abcdef', definition: { name: 'test 1' } });
           mockDb.insertAsync({ _id: expect.it('to match', UUID_REGEX) });
         });
       }).then(() => {
