@@ -68,7 +68,7 @@ export default class CopyStep extends Component {
         </Row>
         <FullRow>
           <ul className={styles.filesList}>
-            {inheritedFiles.map(file => <File {...file.toJS()} />)}
+            {inheritedFiles.map(file => <File key={file.get('name')} {...file.toJS()} />)}
           </ul>
         </FullRow>
         <Row>
