@@ -136,13 +136,11 @@ describe('server - plugins', function () {
     it('allows a copy step', function () {
       expect({
         name: 'x', description: 'y', author: 'me',
-        install: [
-          { 
-            unicode: [
-              { type: 'copy', from: 'plugin.dll', toPrefix: '$PLUGINDIR$', to: '' }
-            ]
-          }
-        ]
+        install: {
+          unicode: [
+            { type: 'copy', from: 'plugin.dll', to: '$PLUGINDIR$' }
+          ]
+        }
       }, 'to validate against schema', pluginSchema);
     });
     
@@ -150,13 +148,11 @@ describe('server - plugins', function () {
   
       expect({
         name: 'x', description: 'y', author: 'me',
-        install: [
-          {
-            unicode: [
-              { type: 'copy', from: 'plugin.dll' }
-            ]
-          }
-        ]
+        install: {
+          unicode: [
+            { type: 'copy', from: 'plugin.dll' }
+          ]
+        }
       }, 'not to validate against schema', pluginSchema);
     });
   });
@@ -164,32 +160,28 @@ describe('server - plugins', function () {
   it('allows a download step', function () {
     expect({
       name: 'x', description: 'y', author: 'me',
-      install: [
-        {
-          unicode: [
-            { type: 'download', url: 'http://blah' }
-          ],
-          x64: [
-            { type: 'download', url: 'http://blah' }
-          ]
-        }
-      ]
+      install: {
+        unicode: [
+          { type: 'download', url: 'http://blah' }
+        ],
+        x64: [
+          { type: 'download', url: 'http://blah' }
+        ]
+      }
     }, 'to validate against schema', pluginSchema);
   });
   
   it('allows a run step', function () {
     expect({
       name: 'x', description: 'y', author: 'me',
-      install: [
-        {
-          unicode: [
-            { type: 'run', path: 'blah' }
-          ],
-          x64: [
-            { type: 'run', path: 'blah' }
-          ]
-        }
-      ]
+      install: {
+        unicode: [
+          { type: 'run', path: 'blah' }
+        ],
+        x64: [
+          { type: 'run', path: 'blah' }
+        ]
+      }
     }, 'to validate against schema', pluginSchema);
   });
 
