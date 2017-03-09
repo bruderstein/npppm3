@@ -38,7 +38,7 @@ Once the plugin details are saved, a new XML file can be generated, and installe
 where the Plugin Manager can download it from. This XML is called the development list. In the
 present setup, this file is automatically available within a few minutes of saving the plugin.
 
-In the previous implementation, every 2 weeks, the current set of plugin metadata is published 
+Then, every 2 weeks, the current set of plugin metadata is published 
 as the "live" file. This is obviously problematic, as it means that edits made even minutes 
 before the publish will be published as "live" to (literally) millions of users. 
 
@@ -60,7 +60,7 @@ of plugins, and also always rollback to a previous version.
 
 ### File Validation
 
-A copy step can optionally validate that a file is what is a known file. This is done generally
+A copy step can optionally validate that a file is a known file. This is done generally
 for any executable code, DLLs for example. The MD5 hash of the file being copied is validated
 against a known list of "good" hashes on the server.  This is done at the point of copying the
 file.
@@ -87,6 +87,8 @@ best to install it on your platform if you've not got it installed yet.
 
 ### Starting the development servers
 In order to start the server, simply clone this project, do a `yarn install`, and then run `npm start`.
+
+You need to have [docker](https://www.docker.com) installed and running for this to work.
 
 ```bash
 $ git clone git@github.com:bruderstein/npppm3
