@@ -249,7 +249,7 @@ describe('auth module', function () {
 
       mockDb.getAsync.withArgs('test1234').returns(Promise.resolve({
         scope: ['login'],
-        displayName: 'anna'
+        displayName: 'Mrs Foo'
       }));
 
       mockDb.insertAsync.returns(Promise.resolve({}));
@@ -319,7 +319,7 @@ describe('auth module', function () {
           password: 'bigS3cret'
         }
       }).then(response => {
-        expect(response.body, 'to satisfy', {
+        expect(response.result, 'to satisfy', {
           email: 'test@foo.com',
           displayName: 'Mrs Foo'
         });
@@ -581,6 +581,7 @@ describe('auth module', function () {
           password: 'bigS3cret'
         }
       }).then(response => {
+        console.log(response)
         expect(response, 'to contain the authorization headers');
       });
     });

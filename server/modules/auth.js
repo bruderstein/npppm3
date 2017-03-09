@@ -146,9 +146,10 @@ const register = module.exports = function register(server, options, next) {
               .then(({ emailDoc, userDoc }) => createAuthTokens(server.app.db, {
                 userId: emailDoc.userId,
                 displayName: request.auth.credentials.profile.displayName,
-                scope: userDoc.scope
+                scope: userDoc.scope,
+                email: emailDoc.email
               }))
-              .then(tokens => createResponse(reply, tokens))
+              .then(({ tokens, userInfo }) => createResponse(reply, tokens, userInfo))
               .catch(e => {
                 if (e.isBoom) {
                   return reply(e);
@@ -181,9 +182,10 @@ const register = module.exports = function register(server, options, next) {
               .then(({ emailDoc, userDoc }) => createAuthTokens(server.app.db, {
                 userId: emailDoc.userId,
                 displayName: userDoc.displayName,
-                scope: userDoc.scope
+                scope: userDoc.scope,
+                email: request.payload.email
               }))
-              .then(tokens => createResponse(reply, tokens))
+              .then(({ tokens, userInfo }) => createResponse(reply, tokens, userInfo))
               .catch(e => mapErrors(e))
               .catch(e => {
                 if (e.isBoom) {
@@ -475,8 +477,9 @@ const createUser = function (db, userOptions) {
     .then(() => db.insertAsync(userDoc));
 };
 
-function createAuthTokens(db, { userId, displayName, scope }) {
+function createAuthTokens(db, userInfo) {
 
+  const { userId, displayName, scope } = userInfo;
   const jwtConfig = config.get('auth.jwt');
   return new Promise((resolve, reject) => {
     jwt.sign({ displayName, scope }, jwtConfig.secret, {
@@ -512,15 +515,15 @@ function createAuthTokens(db, { userId, displayName, scope }) {
       created: Date.now() / 1000  // `created` should be treated like `exp` in the JWT, i.e.
                                         // i.e. use seconds-since-epoch, not milliseconds-since-epoch
     }).then(() => {
-      return { accessToken: tokens.token, refreshToken };
+      return { tokens: { accessToken: tokens.token, refreshToken }, userInfo };
     });
   });
 }
 
-const createResponse = function (reply, { accessToken, refreshToken }) {
+const createResponse = function (reply, { accessToken, refreshToken }, { displayName, email }) {
   if (accessToken) {
 
-    const response = reply({ success: true });
+    const response = reply({ success: true, displayName, email });
     response.state('token', accessToken);
     response.state('refresh', refreshToken);
     return response;
