@@ -8,7 +8,9 @@
     "clean-db": "rm -rf ./couchdb-data",
     "stop-clean-db": "npm run stop-db & npm run clean-db",
     "lint": "eslint .",
-    "test": "mocha \"server/**/tests/*.spec.js\""
+    "test": "npm run test-server && npm run test-client",
+    "test-client": "cd client && npm run test",
+    "test-server": "mocha \"server/**/tests/*.spec.js\""
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",

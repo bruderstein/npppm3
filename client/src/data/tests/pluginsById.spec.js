@@ -1,7 +1,8 @@
 
 import { pluginsByIdReducer as pluginsById } from '../pluginsById';
 import Immutable from 'immutable';
-import { PLUGIN_CREATED, PLUGIN_FIELD_CHANGED, INSTALL_STEP_ADD, PLUGIN_FETCHED, FILE_LIST_FETCHED } from '../pluginsById';
+import { PLUGIN_CREATED, PLUGIN_FIELD_CHANGED, INSTALL_STEP_ADD,
+  INSTALL_STEP_FIELD_CHANGED, PLUGIN_FETCHED, FILE_LIST_FETCHED } from '../pluginsById';
 
 import unexpected from 'unexpected';
 
@@ -92,9 +93,11 @@ describe('pluginsById', function () {
       const withPluginState = pluginsById(baseState, {
         type: PLUGIN_FETCHED,
         response: {
-          pluginId: 'abc123',
-          name: 'foo plugin',
-          author: 'Mr Bar'
+          payload: {
+            pluginId: 'abc123',
+            name: 'foo plugin',
+            author: 'Mr Bar'
+          }
         }
       });
 
@@ -114,23 +117,25 @@ describe('pluginsById', function () {
       state = pluginsById(baseState, {
         type: PLUGIN_FETCHED,
         response: {   // TODO: Need to change this to `payload`
-          pluginId: 'abc123',
-          _rev: '1-111222',
-          definition: {
-            name: 'foo plugin',
-            author: 'Mr Bar',
-            install: {
-              unicode: [
-                {
-                  type: 'download',
-                  url: 'http://example.com/plugin.zip'
-                },
-                {
-                  type: 'copy',
-                  from: '*.dll',
-                  to: '$PLUGINDIR$'
-                }
-              ]
+          payload: {
+            pluginId: 'abc123',
+            _rev: '1-111222',
+            definition: {
+              name: 'foo plugin',
+              author: 'Mr Bar',
+              install: {
+                unicode: [
+                  {
+                    type: 'download',
+                    url: 'http://example.com/plugin.zip'
+                  },
+                  {
+                    type: 'copy',
+                    from: '*.dll',
+                    to: '$PLUGINDIR$'
+                  }
+                ]
+              }
             }
           }
         }
@@ -252,32 +257,34 @@ describe('FILE_LIST_FETCHED with multiple downloads', function () {
     state = pluginsById(baseState, {
       type: PLUGIN_FETCHED,
       response: {   // TODO: Need to change this to `payload`
-        pluginId: 'abc123',
-        _rev: '2-222333',
-        definition: {
-          name: 'foo plugin',
-          author: 'Mr Bar',
-          install: {
-            unicode: [
-              {
-                type: 'download',
-                url: 'http://example.com/plugin.zip'
-              },
-              {
-                type: 'copy',
-                from: 'plugin.dll',
-                to: '$PLUGINDIR$'
-              },
-              {
-                type: 'download',
-                url: 'http://example.com/plugin-addons.zip'
-              },
-              {
-                type: 'copy',
-                from: 'addon.dll',
-                to: '$NPPDIR$'
-              }
-            ]
+        payload: {
+          pluginId: 'abc123',
+          _rev: '2-222333',
+          definition: {
+            name: 'foo plugin',
+            author: 'Mr Bar',
+            install: {
+              unicode: [
+                {
+                  type: 'download',
+                  url: 'http://example.com/plugin.zip'
+                },
+                {
+                  type: 'copy',
+                  from: 'plugin.dll',
+                  to: '$PLUGINDIR$'
+                },
+                {
+                  type: 'download',
+                  url: 'http://example.com/plugin-addons.zip'
+                },
+                {
+                  type: 'copy',
+                  from: 'addon.dll',
+                  to: '$NPPDIR$'
+                }
+              ]
+            }
           }
         }
       }
@@ -480,22 +487,25 @@ describe('FILE_LIST_FETCHED with multiple downloads', function () {
       let state = pluginsById(undefined, {
         type: PLUGIN_FETCHED,
         response: {
-          pluginId: 'abc123',
-          definition: {
-            name: 'foo plugin',
-            author: 'Mr Bar',
-            install: {
-              unicode: [
-                { type: 'download', url: 'http://example.com/plugin.zip' },
-                { type: 'copy' }
-              ]
+          payload: {
+            pluginId: 'abc123',
+            definition: {
+              name: 'foo plugin',
+              author: 'Mr Bar',
+              install: {
+                unicode: [
+                  { type: 'download', url: 'http://example.com/plugin.zip' },
+                  { type: 'copy' }
+                ]
+              }
             }
           }
         }
       });
 
+
       state = pluginsById(state, {
-        type: 'FILE_LIST_FETCHED',
+        type: FILE_LIST_FETCHED,
         payload: {
           pluginId: 'abc123',
           installRemove: 'install',
@@ -510,7 +520,7 @@ describe('FILE_LIST_FETCHED with multiple downloads', function () {
       });
       // TODO: Set the 'to' field of  the copy step, and then validate the plugin.dll file is highlighted
       state = pluginsById(state, {
-        type: 'INSTALL_STEP_FIELD_CHANGED',
+        type: INSTALL_STEP_FIELD_CHANGED,
         payload: {
           pluginId: 'abc123',
           installRemove: 'install',

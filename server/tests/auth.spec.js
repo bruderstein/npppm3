@@ -581,7 +581,6 @@ describe('auth module', function () {
           password: 'bigS3cret'
         }
       }).then(response => {
-        console.log(response)
         expect(response, 'to contain the authorization headers');
       });
     });
