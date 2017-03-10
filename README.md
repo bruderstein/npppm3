@@ -1,3 +1,7 @@
+## Status: In development - see the issues
+
+Check the issues to see what needs doing - it'd be great if you'd like to contribute, just pick an issue. The older issues probably need to be done first, just because they were created so things are developed in a sensible order.
+
 # Notepad++ Plugin Manager Admin System
 
 This is the web administration interface for [Notepad++](http://notepad-plus-plus.org) Plugin Manager
