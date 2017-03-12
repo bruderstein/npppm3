@@ -268,9 +268,17 @@ registerReducer('pluginsById', pluginsById);
 // For tests
 export { pluginsById as pluginsByIdReducer };
 
-// Selector
+// Plugin Selector
 export function pluginById(state, id) {
   return state.pluginsById.get(id);
 }
+
+// Hashes Selector
+
+const hashSelector = function (state, pluginId) {
+  return state.pluginsById.getIn([pluginId, 'hashes']) || Immutable.Map();
+};
+
+export { hashSelector };
 
 

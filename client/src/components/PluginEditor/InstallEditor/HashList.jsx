@@ -1,6 +1,6 @@
 import Hash from './Hash';
 import React, { Component, PropTypes } from 'react';
-import { hashSelector } from '../../../data/hashes';
+import { hashSelector } from '../../../data/pluginsById';
 import { connect } from 'react-redux';
 
 class HashList extends Component {

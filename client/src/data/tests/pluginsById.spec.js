@@ -1,5 +1,5 @@
 
-import { pluginsByIdReducer as pluginsById } from '../pluginsById';
+import { pluginsByIdReducer as pluginsById, hashSelector } from '../pluginsById';
 import Immutable from 'immutable';
 import { PLUGIN_CREATED, PLUGIN_FIELD_CHANGED, INSTALL_STEP_ADD,
   INSTALL_STEP_FIELD_CHANGED, PLUGIN_FETCHED, FILE_LIST_FETCHED } from '../pluginsById';
@@ -109,7 +109,7 @@ describe('pluginsById', function () {
 
     });
   });
-  
+
   describe('FILE_LIST_FETCHED', function () {
     let state;
     beforeEach(function () {
@@ -237,7 +237,8 @@ describe('pluginsById', function () {
         install: {
           unicode: [
             { type: 'download' },
-            { type: 'copy', from: '*.dll', $inheritedFiles: [
+            {
+              type: 'copy', from: '*.dll', $inheritedFiles: [
               { name: 'plugin.dll', highlighted: true },
               { name: 'readme.txt', highlighted: expect.it('to be falsy') }
             ]
@@ -247,255 +248,41 @@ describe('pluginsById', function () {
       });
     });
   });
-});
 
-describe('FILE_LIST_FETCHED with multiple downloads', function () {
+  describe('FILE_LIST_FETCHED with multiple downloads', function () {
 
-  let state;
-  beforeEach(function () {
-    const baseState = pluginsById(undefined, {});
-    state = pluginsById(baseState, {
-      type: PLUGIN_FETCHED,
-      response: {   // TODO: Need to change this to `payload`
-        payload: {
-          pluginId: 'abc123',
-          _rev: '2-222333',
-          definition: {
-            name: 'foo plugin',
-            author: 'Mr Bar',
-            install: {
-              unicode: [
-                {
-                  type: 'download',
-                  url: 'http://example.com/plugin.zip'
-                },
-                {
-                  type: 'copy',
-                  from: 'plugin.dll',
-                  to: '$PLUGINDIR$'
-                },
-                {
-                  type: 'download',
-                  url: 'http://example.com/plugin-addons.zip'
-                },
-                {
-                  type: 'copy',
-                  from: 'addon.dll',
-                  to: '$NPPDIR$'
-                }
-              ]
-            }
-          }
-        }
-      }
-    });
-
-  });
-
-  it('only applies to the inherited files to copy steps AFTER the download', function () {
-
-    state = pluginsById(state, {
-      type: FILE_LIST_FETCHED,
-      payload: {
-        pluginId: 'abc123',
-        installRemove: 'install',
-        installType: 'unicode',
-        url: 'http://example.com/plugin-addons.zip',
-        files: [
-            { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' }
-        ]
-      }
-    });
-
-    expect(state.toJS(), 'to satisfy', {
-      abc123: {
-        definition: {
-          install: {
-            unicode: [
-                { type: 'download', $filesAvailable: undefined },
-                { type: 'copy', $inheritedFiles: [] },
-              {
-                type: 'download',
-                $filesAvailable: [
-                    { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' }
-                ]
-              },
-              {
-                type: 'copy',
-                $inheritedFiles: [
-                    { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' }
-                ]
-              }
-            ]
-          }
-        }
-      }
-    });
-
-  });
-
-  it('merges files when there is more than one download', function () {
-
-    state = pluginsById(state, {
-      type: FILE_LIST_FETCHED,
-      payload: {
-        pluginId: 'abc123',
-        installRemove: 'install',
-        installType: 'unicode',
-        url: 'http://example.com/plugin.zip',
-        files: [
-            { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-            { name: 'readme.txt', md5: '11112222333344445555666677778888' },
-        ]
-      }
-    });
-
-      // Second file set arrives
-      // with an new file (addon.dll), and a file of the same name but different content
-      // Copy steps AFTER the download of that should use the newer (second) version of the file
-    state = pluginsById(state, {
-      type: FILE_LIST_FETCHED,
-      payload: {
-        pluginId: 'abc123',
-        installRemove: 'install',
-        installType: 'unicode',
-        url: 'http://example.com/plugin-addons.zip',
-        files: [
-            { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-            { name: 'readme.txt', md5: '88887777666655554444333322221111' },
-        ]
-      }
-    });
-    expect(state.toJS(), 'to satisfy', {
-      abc123: {
-        definition: {
-          install: {
-            unicode: [
-              {
-                type: 'download',
-                $filesAvailable: [
-                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-                    { name: 'readme.txt', md5: '11112222333344445555666677778888' },
-                ]
-              },
-              {
-                type: 'copy',
-                $inheritedFiles: [
-                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-                    { name: 'readme.txt', md5: '11112222333344445555666677778888' },
-                ]
-              },
-              {
-                type: 'download',
-                $filesAvailable: [
-                    { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-                    { name: 'readme.txt', md5: '88887777666655554444333322221111' },
-                ]
-              },
-              {
-                type: 'copy',
-                $inheritedFiles: [
-                    { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-                    { name: 'readme.txt', md5: '88887777666655554444333322221111' } // readme.txt from plugin-addons.zip
-                ]
-              }
-            ]
-          }
-        }
-      }
-    });
-
-  });
-
-
-  it('adds inheritedFiles when a copy step is added', function () {
-
-    state = pluginsById(state, {
-      type: FILE_LIST_FETCHED,
-      payload: {
-        pluginId: 'abc123',
-        installRemove: 'install',
-        installType: 'unicode',
-        url: 'http://example.com/plugin.zip',
-        files: [
-            { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-            { name: 'readme.txt', md5: '11112222333344445555666677778888' },
-        ]
-      }
-    });
-
-    state = pluginsById(state, {
-      type: INSTALL_STEP_ADD,
-      payload: {
-        pluginId: 'abc123',
-        installRemove: 'install',
-        installType: 'unicode',
-        type: 'copy'
-      }
-    });
-
-    expect(state.toJS(), 'to satisfy', {
-      abc123: {
-        definition: {
-          install: {
-            unicode: [
-              {
-                type: 'download',
-                $filesAvailable: [
-                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-                    { name: 'readme.txt', md5: '11112222333344445555666677778888' }
-                ]
-              },
-              {
-                type: 'copy',
-                $inheritedFiles: [
-                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-                    { name: 'readme.txt', md5: '11112222333344445555666677778888' }
-                ]
-              },
-              {
-                type: 'download'
-              },
-              {
-                type: 'copy',
-                $inheritedFiles: [
-                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-                    { name: 'readme.txt', md5: '11112222333344445555666677778888' }
-                ]
-              },
-              {
-                type: 'copy',
-                $inheritedFiles: [
-                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
-                    { name: 'readme.txt', md5: '11112222333344445555666677778888' }
-                ]
-              }
-            ]
-          }
-        }
-      }
-    });
-
-  });
-
-
-  describe('PLUGIN_FIELD_CHANGED `from` in copy step', function () {
-
-    it('marks the inherited files as matching', function () {
-
-      let state = pluginsById(undefined, {
+    let state;
+    beforeEach(function () {
+      const baseState = pluginsById(undefined, {});
+      state = pluginsById(baseState, {
         type: PLUGIN_FETCHED,
-        response: {
+        response: {   // TODO: Need to change this to `payload`
           payload: {
             pluginId: 'abc123',
+            _rev: '2-222333',
             definition: {
               name: 'foo plugin',
               author: 'Mr Bar',
               install: {
                 unicode: [
-                  { type: 'download', url: 'http://example.com/plugin.zip' },
-                  { type: 'copy' }
+                  {
+                    type: 'download',
+                    url: 'http://example.com/plugin.zip'
+                  },
+                  {
+                    type: 'copy',
+                    from: 'plugin.dll',
+                    to: '$PLUGINDIR$'
+                  },
+                  {
+                    type: 'download',
+                    url: 'http://example.com/plugin-addons.zip'
+                  },
+                  {
+                    type: 'copy',
+                    from: 'addon.dll',
+                    to: '$NPPDIR$'
+                  }
                 ]
               }
             }
@@ -503,6 +290,51 @@ describe('FILE_LIST_FETCHED with multiple downloads', function () {
         }
       });
 
+    });
+
+    it('only applies to the inherited files to copy steps AFTER the download', function () {
+
+      state = pluginsById(state, {
+        type: FILE_LIST_FETCHED,
+        payload: {
+          pluginId: 'abc123',
+          installRemove: 'install',
+          installType: 'unicode',
+          url: 'http://example.com/plugin-addons.zip',
+          files: [
+            { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' }
+          ]
+        }
+      });
+
+      expect(state.toJS(), 'to satisfy', {
+        abc123: {
+          definition: {
+            install: {
+              unicode: [
+                { type: 'download', $filesAvailable: undefined },
+                { type: 'copy', $inheritedFiles: [] },
+                {
+                  type: 'download',
+                  $filesAvailable: [
+                    { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' }
+                  ]
+                },
+                {
+                  type: 'copy',
+                  $inheritedFiles: [
+                    { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      });
+
+    });
+
+    it('merges files when there is more than one download', function () {
 
       state = pluginsById(state, {
         type: FILE_LIST_FETCHED,
@@ -512,37 +344,235 @@ describe('FILE_LIST_FETCHED with multiple downloads', function () {
           installType: 'unicode',
           url: 'http://example.com/plugin.zip',
           files: [
-            { name: 'plugin.dll', md5: 'aaabbbcc' },
-            { name: 'plugin2.dll', md5: '111222333' },
-            { name: 'readme.txt', md5: '444555666' }
+            { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+            { name: 'readme.txt', md5: '11112222333344445555666677778888' },
           ]
         }
       });
-      // TODO: Set the 'to' field of  the copy step, and then validate the plugin.dll file is highlighted
+
+      // Second file set arrives
+      // with an new file (addon.dll), and a file of the same name but different content
+      // Copy steps AFTER the download of that should use the newer (second) version of the file
       state = pluginsById(state, {
-        type: INSTALL_STEP_FIELD_CHANGED,
+        type: FILE_LIST_FETCHED,
         payload: {
           pluginId: 'abc123',
           installRemove: 'install',
           installType: 'unicode',
-          stepNumber: 1,
-          field: 'from',
-          value: '*.dll'
-        }
-      });
-
-      expect(state.getIn(['abc123', 'definition']).toJS(), 'to satisfy', {
-        install: {
-          unicode: [
-            { type: 'download' },
-            { type: 'copy', from: '*.dll', $inheritedFiles: [
-              { name: 'plugin.dll', highlighted: true },
-              { name: 'plugin2.dll', highlighted: true },
-              { name: 'readme.txt', highlighted: expect.it('to be falsy') }
-            ] }
+          url: 'http://example.com/plugin-addons.zip',
+          files: [
+            { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+            { name: 'readme.txt', md5: '88887777666655554444333322221111' },
           ]
         }
       });
+      expect(state.toJS(), 'to satisfy', {
+        abc123: {
+          definition: {
+            install: {
+              unicode: [
+                {
+                  type: 'download',
+                  $filesAvailable: [
+                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+                    { name: 'readme.txt', md5: '11112222333344445555666677778888' },
+                  ]
+                },
+                {
+                  type: 'copy',
+                  $inheritedFiles: [
+                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+                    { name: 'readme.txt', md5: '11112222333344445555666677778888' },
+                  ]
+                },
+                {
+                  type: 'download',
+                  $filesAvailable: [
+                    { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+                    { name: 'readme.txt', md5: '88887777666655554444333322221111' },
+                  ]
+                },
+                {
+                  type: 'copy',
+                  $inheritedFiles: [
+                    { name: 'addon.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+                    { name: 'readme.txt', md5: '88887777666655554444333322221111' } // readme.txt from plugin-addons.zip
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      });
+
     });
+
+
+    it('adds inheritedFiles when a copy step is added', function () {
+
+      state = pluginsById(state, {
+        type: FILE_LIST_FETCHED,
+        payload: {
+          pluginId: 'abc123',
+          installRemove: 'install',
+          installType: 'unicode',
+          url: 'http://example.com/plugin.zip',
+          files: [
+            { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+            { name: 'readme.txt', md5: '11112222333344445555666677778888' },
+          ]
+        }
+      });
+
+      state = pluginsById(state, {
+        type: INSTALL_STEP_ADD,
+        payload: {
+          pluginId: 'abc123',
+          installRemove: 'install',
+          installType: 'unicode',
+          type: 'copy'
+        }
+      });
+
+      expect(state.toJS(), 'to satisfy', {
+        abc123: {
+          definition: {
+            install: {
+              unicode: [
+                {
+                  type: 'download',
+                  $filesAvailable: [
+                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+                    { name: 'readme.txt', md5: '11112222333344445555666677778888' }
+                  ]
+                },
+                {
+                  type: 'copy',
+                  $inheritedFiles: [
+                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+                    { name: 'readme.txt', md5: '11112222333344445555666677778888' }
+                  ]
+                },
+                {
+                  type: 'download'
+                },
+                {
+                  type: 'copy',
+                  $inheritedFiles: [
+                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+                    { name: 'readme.txt', md5: '11112222333344445555666677778888' }
+                  ]
+                },
+                {
+                  type: 'copy',
+                  $inheritedFiles: [
+                    { name: 'plugin.dll', md5: 'aaaabbbbccccddddeeeeffff11112222' },
+                    { name: 'readme.txt', md5: '11112222333344445555666677778888' }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      });
+
+    });
+
+
+    describe('PLUGIN_FIELD_CHANGED `from` in copy step', function () {
+
+      it('marks the inherited files as matching', function () {
+
+        let state = pluginsById(undefined, {
+          type: PLUGIN_FETCHED,
+          response: {
+            payload: {
+              pluginId: 'abc123',
+              definition: {
+                name: 'foo plugin',
+                author: 'Mr Bar',
+                install: {
+                  unicode: [
+                    { type: 'download', url: 'http://example.com/plugin.zip' },
+                    { type: 'copy' }
+                  ]
+                }
+              }
+            }
+          }
+        });
+
+
+        state = pluginsById(state, {
+          type: FILE_LIST_FETCHED,
+          payload: {
+            pluginId: 'abc123',
+            installRemove: 'install',
+            installType: 'unicode',
+            url: 'http://example.com/plugin.zip',
+            files: [
+              { name: 'plugin.dll', md5: 'aaabbbcc' },
+              { name: 'plugin2.dll', md5: '111222333' },
+              { name: 'readme.txt', md5: '444555666' }
+            ]
+          }
+        });
+        // TODO: Set the 'to' field of  the copy step, and then validate the plugin.dll file is highlighted
+        state = pluginsById(state, {
+          type: INSTALL_STEP_FIELD_CHANGED,
+          payload: {
+            pluginId: 'abc123',
+            installRemove: 'install',
+            installType: 'unicode',
+            stepNumber: 1,
+            field: 'from',
+            value: '*.dll'
+          }
+        });
+
+        expect(state.getIn(['abc123', 'definition']).toJS(), 'to satisfy', {
+          install: {
+            unicode: [
+              { type: 'download' },
+              {
+                type: 'copy', from: '*.dll', $inheritedFiles: [
+                { name: 'plugin.dll', highlighted: true },
+                { name: 'plugin2.dll', highlighted: true },
+                { name: 'readme.txt', highlighted: expect.it('to be falsy') }
+              ]
+              }
+            ]
+          }
+        });
+      });
+    });
+  });
+
+
+  describe('hashes', function () {
+
+    it('adds the hashes', function () {
+
+      const state = pluginsById(undefined, {
+        type: PLUGIN_FETCHED,
+        response: {
+          payload: {
+            pluginId: 'abc123',
+            hashes: {
+              '11112222333344445555666677778888': 'ok',
+              'aaaabbbbccccddddeeeeffff11112222': 'bad'
+            }
+          }
+        }
+      });
+
+      const result = hashSelector({ pluginsById: state }, 'abc123');
+      expect(result.toJS(), 'to satisfy', {
+        '11112222333344445555666677778888': 'ok',
+        'aaaabbbbccccddddeeeeffff11112222': 'bad'
+      });
+    });
+
   });
 });
