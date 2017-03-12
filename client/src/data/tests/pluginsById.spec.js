@@ -518,7 +518,7 @@ describe('pluginsById', function () {
             ]
           }
         });
-        // TODO: Set the 'to' field of  the copy step, and then validate the plugin.dll file is highlighted
+
         state = pluginsById(state, {
           type: INSTALL_STEP_FIELD_CHANGED,
           payload: {
