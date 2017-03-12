@@ -1925,17 +1925,7 @@ he@1.1.x:
   version "1.1.0"
   resolved "https://registry.npmjs.org/he/-/he-1.1.0.tgz#29319d49beec13a9b1f3c4f9b2a6dde4859bb2a7"
 
-history@^4.3.0:
-  version "4.4.1"
-  resolved "https://registry.npmjs.org/history/-/history-4.4.1.tgz#88c2634b6b8cc68252258a7ddaa3f5f193641955"
-  dependencies:
-    invariant "^2.2.1"
-    loose-envify "^1.2.0"
-    resolve-pathname "^2.0.0"
-    value-equal "^0.1.1"
-    warning "^3.0.0"
-
-history@^4.5.1:
+history@^4.3.0, history@^4.5.1:
   version "4.5.1"
   resolved "https://registry.yarnpkg.com/history/-/history-4.5.1.tgz#44935a51021e3b8e67ebac267a35675732aba569"
   dependencies:
@@ -2463,7 +2453,7 @@ jest-matcher-utils@^17.0.3:
     chalk "^1.1.3"
     pretty-format "~4.2.1"
 
-jest-matchers@^17.0.3:
+"jest-matchers@>=16.0.0 <19.0.0", jest-matchers@^17.0.3:
   version "17.0.3"
   resolved "https://registry.npmjs.org/jest-matchers/-/jest-matchers-17.0.3.tgz#88b95348c919343db86d08f12354a8650ae7eddf"
   dependencies:
@@ -2550,6 +2540,10 @@ js-tokens@^2.0.0:
 js-tokens@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.1.tgz#08e9f132484a2c45a30907e9dc4d5567b7f114d7"
+
+js-writer@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/js-writer/-/js-writer-1.1.0.tgz#7db97924bbacfc311d176b2401f2940a4006efc9"
 
 js-yaml@3.x, js-yaml@^3.4.3:
   version "3.7.0"
@@ -4491,6 +4485,12 @@ unexpected-htmllike-jsx-adapter@^1.0.1:
   dependencies:
     object-assign "^4.0.1"
 
+unexpected-htmllike-raw-adapter@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/unexpected-htmllike-raw-adapter/-/unexpected-htmllike-raw-adapter-1.0.0.tgz#7f6d182d1b6d39f67ffddbd0e69ec40b6b26ea98"
+  dependencies:
+    object-assign "^4.0.1"
+
 unexpected-htmllike-reactrendered-adapter@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/unexpected-htmllike-reactrendered-adapter/-/unexpected-htmllike-reactrendered-adapter-2.0.1.tgz#c9b3e597d9cbbdfeab171035836c6a7f2d8a48e5"
@@ -4512,14 +4512,17 @@ unexpected-htmllike@^2.1.2:
     array-changes-async "^2.2.0"
     object-assign "^4.0.1"
 
-unexpected-react:
-  version "3.3.2"
-  resolved "https://registry.npmjs.org/unexpected-react/-/unexpected-react-3.3.2.tgz#e3ba381caab40636d2213101ceea2e44107a41f9"
+unexpected-react@^3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/unexpected-react/-/unexpected-react-3.5.0.tgz#94fc86801e321b31e046545748de5cc068cfe979"
   dependencies:
+    jest-matchers ">=16.0.0 <19.0.0"
+    js-writer "^1.1.0"
     magicpen-prism "^2.2.1"
     react-render-hook "^0.1.3"
     unexpected-htmllike "^2.1.2"
     unexpected-htmllike-jsx-adapter "^1.0.1"
+    unexpected-htmllike-raw-adapter "^1.0.0"
     unexpected-htmllike-reactrendered-adapter "^2.0.1"
     unexpected-htmllike-testrenderer-adapter "^1.0.0"
 
@@ -4606,10 +4609,6 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
-
-value-equal@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/value-equal/-/value-equal-0.1.1.tgz#b174df21f203c81e17f2e4d59d3a900024cbef7b"
 
 value-equal@^0.2.0:
   version "0.2.0"
