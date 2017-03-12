@@ -10,7 +10,6 @@ import unexpectedSinon from 'unexpected-sinon';
 
 const expect = unexpected
   .clone()
-
   .use(unexpectedReact)
   .use(unexpectedSinon);
 
