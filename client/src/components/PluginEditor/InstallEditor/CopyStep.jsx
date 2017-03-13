@@ -45,13 +45,14 @@ export default class CopyStep extends Component {
     this.props.onFieldChange(field, e.target.value);
   }
 
-  onCheckChange(field, e) {
-    this.props.onFieldChange(field, e.checked);
+  onCheckChange(e) {
+    this.props.onFieldChange(e.target.name, e.target.checked);
   }
 
   render() {
 
     const { from, isDirectory, validate, backup } = this.props.step.toJS();
+    const { pluginId } = this.props;
     const { toVariable, toPath } = this.state;
     const inheritedFiles = this.props.step.get('$inheritedFiles') || Immutable.List();
 
@@ -68,7 +69,7 @@ export default class CopyStep extends Component {
         </Row>
         <FullRow>
           <ul className={styles.filesList}>
-            {inheritedFiles.map(file => <File key={file.get('name')} {...file.toJS()} />)}
+            {inheritedFiles.map(file => <File key={file.get('name')} pluginId={pluginId} validated={validate} {...file.toJS()} />)}
           </ul>
         </FullRow>
         <Row>
@@ -88,15 +89,15 @@ export default class CopyStep extends Component {
         </Row>
         <Row>
           <Cell small="12" large="4">
-            <input type="checkbox" id={uniqueId + '-is-dir'} checked={isDirectory} />
+            <input type="checkbox" id={uniqueId + '-is-dir'} checked={!!isDirectory} name="isDirectory" onChange={this.onCheckChange} />
             <label htmlFor={uniqueId + '-is-dir'}>Destination is directory</label>
           </Cell>
           <Cell small="12" large="4">
-            <input type="checkbox" id={uniqueId + '-validate'} checked={validate} />
+            <input type="checkbox" id={uniqueId + '-validate'} checked={!!validate} name="validate" onChange={this.onCheckChange} />
             <label htmlFor={uniqueId + '-validate'}>Validate</label>
           </Cell>
           <Cell small="12" large="4">
-            <input type="checkbox" id={uniqueId + '-backup'} checked={backup} />
+            <input type="checkbox" id={uniqueId + '-backup'} checked={!!backup} name="backup" onChange={this.onCheckChange} />
             <label htmlFor={uniqueId + '-backup'}>Backup old versions</label>
           </Cell>
         </Row>

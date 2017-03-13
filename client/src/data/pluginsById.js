@@ -13,6 +13,7 @@ export const INSTALL_STEP_ADD = 'npppm/pluginsById/INSTALL_STEP_ADD';
 export const PLUGIN_SAVED = 'npppm/pluginsById/PLUGIN_SAVED';
 export const FILE_LIST_FETCHED = 'npppm/pluginsById/FILE_LIST_FETCHED';
 export const FILE_LIST_FETCH_FAILED = 'npppm/pluginsById/FILE_LIST_FETCH_FAILED';
+export const ADD_HASH = 'npppm/pluginsById/ADD_HASH';
 
 export const fetchPlugin = function (id) {
   return fetchJson('/api/plugins/' + id)
@@ -89,6 +90,17 @@ export const savePlugin = function (pluginId, plugin) {
   });
 };
 
+export const addHash = function (pluginId, hash, response) {
+  return {
+    type: ADD_HASH,
+    payload: {
+      pluginId,
+      hash,
+      response
+    }
+  };
+};
+
 const stripExtraFields = function (item) {
   if (item && typeof item === 'object') {
     Object.keys(item).forEach(key => {
@@ -156,7 +168,7 @@ function pluginsById(state = Immutable.Map(), action) {
         .updateIn([pluginId, 'definition', installRemove, installType, stepNumber], (step) => {
           if (step.get('type') === 'copy' && field === 'from' && step.get('$inheritedFiles')) {
             const pattern = patternToRegex(value);
-            step = step.update('$inheritedFiles', (files) => highlightInheritedFiles(pattern, files));
+            step = step.update('$inheritedFiles', (files) => highlightInheritedFiles(pattern, files, step.get('validate'), getPluginHashes(state, pluginId)));
           }
           return step.set(field, value);
         });
@@ -170,7 +182,7 @@ function pluginsById(state = Immutable.Map(), action) {
         .mergeDeep({ [pluginId]: { definition: { [installRemove]: { [installType]: [] } } } })
          .updateIn([pluginId, 'definition', installRemove, installType],
            steps => steps.push(Immutable.Map({ type })));
-      state = state.updateIn([ pluginId, 'definition', installRemove, installType ], steps => inheritFilesToCopySteps(steps));
+      state = state.updateIn([ pluginId, 'definition', installRemove, installType ], steps => inheritFilesToCopySteps(steps, getPluginHashes(state, pluginId)));
       return state;
     }
 
@@ -183,7 +195,7 @@ function pluginsById(state = Immutable.Map(), action) {
           }
           return step;
         });
-      return state.setIn([ pluginId, 'definition', installRemove, installType ], inheritFilesToCopySteps(newSteps));
+      return state.setIn([ pluginId, 'definition', installRemove, installType ], inheritFilesToCopySteps(newSteps, getPluginHashes(state, pluginId)));
     }
 
     case FILE_LIST_FETCH_FAILED: {
@@ -195,7 +207,7 @@ function pluginsById(state = Immutable.Map(), action) {
           }
           return step;
         });
-      return state.setIn([ pluginId, 'definition', installRemove, installType ], inheritFilesToCopySteps(newSteps));
+      return state.setIn([ pluginId, 'definition', installRemove, installType ], inheritFilesToCopySteps(newSteps, hashSelector(state, pluginId)));
     }
 
     case PLUGIN_SAVED: {
@@ -207,13 +219,25 @@ function pluginsById(state = Immutable.Map(), action) {
       return state;
     }
 
+    case ADD_HASH: {
+      const { pluginId, hash, response } = action.payload;
+      state = state.mergeDeep({ [pluginId]: { hashes: { [hash]: response } } });
+
+      const hashes = getPluginHashes(state, pluginId);
+      return state.updateIn([ pluginId, 'definition', 'install' ], (install) => {
+        return install.map((steps) => {
+          return inheritFilesToCopySteps(steps, hashes);
+        });
+      });
+    }
+
     default:
       return state;
   }
 }
 
 
-function inheritFilesToCopySteps(steps) {
+function inheritFilesToCopySteps(steps, hashes) {
   let currentFiles = Immutable.List();
   return steps.map(step => {
     if (step.get('type') === 'download' && step.get('$filesAvailable')) {
@@ -221,7 +245,7 @@ function inheritFilesToCopySteps(steps) {
     }
 
     if (step.get('type') === 'copy') {
-      step = step.set('$inheritedFiles', highlightInheritedFiles(patternToRegex(step.get('from')), currentFiles));
+      step = step.set('$inheritedFiles', highlightInheritedFiles(patternToRegex(step.get('from')), currentFiles, step.get('validate'), hashes));
     }
     return step;
   });
@@ -257,10 +281,18 @@ function patternToRegex(pattern) {
   return minimatch.makeRe(pattern, { nocase: true, nocomment: true, noext: true, noglobstar: true, nonegate: true });
 }
 
-function highlightInheritedFiles(pattern, inheritedFiles) {
-  return inheritedFiles.map(file => {
-    return file.set('highlighted', pattern.test(file.get('name')));
-  });
+function highlightInheritedFiles(pattern, inheritedFiles, validate, hashes) {
+  return inheritedFiles.map(file => file.withMutations(function (file) {
+    const matches = pattern.test(file.get('name'));
+    file.set('highlighted', matches);
+    if (validate && matches) {
+      const hashRegistered = hashes.get(file.get('md5'));
+      file.set('hashRegistered', hashRegistered || null);
+    } else {
+      file.set('hashRegistered', null);
+    }
+    return file;
+  }));
 }
 
 registerReducer('pluginsById', pluginsById);
@@ -275,8 +307,12 @@ export function pluginById(state, id) {
 
 // Hashes Selector
 
+const getPluginHashes = function (localState, pluginId) {
+  return localState && localState.getIn([pluginId, 'hashes']) || Immutable.Map();
+};
+
 const hashSelector = function (state, pluginId) {
-  return state.pluginsById.getIn([pluginId, 'hashes']) || Immutable.Map();
+  return state && getPluginHashes(state.pluginsById, pluginId)
 };
 
 export { hashSelector };

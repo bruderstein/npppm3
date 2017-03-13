@@ -25,15 +25,19 @@ export default class Step extends Component {
   };
 
   onFieldChange(fieldName, value) {
-    this.props.onFieldChange(this.props.stepNumber, fieldName, value);
+    this.props.onFieldChange({
+      stepNumber: this.props.stepNumber,
+      field: fieldName,
+      value: value
+    });
   }
 
   render() {
-    const { step, onFieldChange, ...restProps } = this.props;
+    const { step, pluginId, ...restProps } = this.props;
     const stepType = step.get('type');
 
     const StepComponent = stepComponents[stepType] || UnknownStep;
 
-    return <StepComponent step={step} onFieldChange={this.onFieldChange} {...restProps} />;
+    return <StepComponent {...restProps} pluginId={pluginId} step={step} onFieldChange={this.onFieldChange} />;
   }
 }

@@ -1,5 +1,17 @@
 
 .highlighted {
-  color: red;
   font-weight: bold;
 }
+
+.highlighted.validated.validationRequired {
+  color: red;
+}
+
+.highlighted.validated.validationOk {
+  color: #1bda1b;
+}
+
+.highlighted.validated.validationBad {
+  color: hotpink;
+}
+
