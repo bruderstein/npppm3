@@ -3,8 +3,6 @@ import { connect } from 'react-redux';
 import Immutable from 'immutable';
 import styles from './plugin-editor.css';
 
-import { fetchPlugin } from '../../actions'
-
 import { Row, Cell, FullRow } from '../Grid';
 import AliasInput from './AliasInput';
 import DependenciesInput from './DependenciesInput';

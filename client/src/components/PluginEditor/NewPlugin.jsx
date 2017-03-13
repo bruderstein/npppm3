@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { createNewPlugin, fieldChanged, saveNewPlugin } from '../../actions';
+import { createNewPlugin, fieldChanged, saveNewPlugin } from '../../data/pluginsById';
 import PluginEditor from './PluginEditor';
 
 class NewPlugin extends Component {
