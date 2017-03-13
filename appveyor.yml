@@ -1,0 +1,16 @@
+version: 1.0.{build}
+image: Visual Studio 2015
+
+build:
+    verbosity: minimal
+
+build_script:
+    - cd "%APPVEYOR_BUILD_FOLDER%"
+    - yarn outdated
+    - yarn install
+    - cd client
+    - yarn outdated
+    - yarn install
+    #- cd ..
+    - npm test
+

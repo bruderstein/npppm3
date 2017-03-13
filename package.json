@@ -1,6 +1,7 @@
 {
   "name": "npppm",
   "version": "3.0.0",
+  "license": "MIT",
   "scripts": {
     "start": "nodemon server/index.js",
     "start-db": "docker run -d --name npppm-couchdb -e NODENAME=single -p 5985:5984 -v $(pwd)/couchdb-data:/opt/couchdb/data klaemo/couchdb && scripts/initialise-couchdb.sh localhost:5985",
