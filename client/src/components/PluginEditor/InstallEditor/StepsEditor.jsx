@@ -21,7 +21,7 @@ class StepsEditor extends Component {
     onFieldChange: PropTypes.func
   };
 
-  onFieldChange(stepNumber, field, value) {
+  onFieldChange({ stepNumber, field, value }) {
     const { onFieldChange, pluginId, installRemove, installType } = this.props;
     onFieldChange({ pluginId, installRemove, installType, stepNumber, field, value })
   }
